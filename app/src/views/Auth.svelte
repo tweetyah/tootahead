@@ -33,4 +33,6 @@
   })
 </script>
 
-<div>auth!</div>
+<div class="grid justify-center">
+  <i style="font-size: 48px;" class='bx bx-loader-alt bx-spin bx-flip-horizontal mt-4' ></i>
+</div>
