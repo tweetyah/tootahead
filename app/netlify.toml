@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  functions = "functions"
+  publish = "dist"
+
+[dev]
+  targetPort = 5173
+  framework = "vite"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

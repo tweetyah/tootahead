@@ -1,0 +1,1 @@
+atlas schema apply -u mysql://localhost/tweetyah -f schema.hcl

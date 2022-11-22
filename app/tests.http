@@ -1,0 +1,31 @@
+@hostname = http://localhost:8888/.netlify/functions
+
+### get tweets
+get {{hostname}}/tweets
+
+
+### post tweet
+post {{hostname}}/tweets
+Content-Type: application/json
+
+[
+  {
+    "text": "this is a test"
+  }
+]
+
+### post tweets
+post {{hostname}}/tweets
+Content-Type: application/json
+
+[
+  {
+    "text": "this is a test"
+  },
+  {
+    "text": "this is another!"
+  },
+  {
+    "text": "final countdown!"
+  }
+]

@@ -1,0 +1,1 @@
+aws lightsail get-container-images --service-name tweetyah-scheduler --region us-east-1
