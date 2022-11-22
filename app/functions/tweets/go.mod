@@ -2,6 +2,9 @@ module tweets
 
 go 1.19
 
+replace github.com/tweetyah/lib => ../../../lib
+
+
 require (
 	github.com/aws/aws-lambda-go v1.34.1
 	github.com/bmorrisondev/go-utils v1.0.1

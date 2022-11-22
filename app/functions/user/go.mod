@@ -2,7 +2,7 @@ module user
 
 go 1.19
 
-replace core => ../core
+replace github.com/tweetyah/lib => ../../../lib
 
 require (
 	github.com/aws/aws-lambda-go v1.34.1

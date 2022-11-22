@@ -7,8 +7,8 @@ import (
 )
 
 func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration time.Time, refreshToken string) error {
-	query := `insert into users
-			(id, access_token, access_token_expiry, refresh_token) values (?, ?, ?, ?)
+	query := `insert into user_tokens
+			(id, user_id, access_token, access_token_expiry, refresh_token) values (?, ?, ?, ?, ?)
 		on duplicate key update
 			access_token = ?, access_token_expiry = ?, refresh_token = ?`
 	db, err := GetDatabase()
@@ -17,6 +17,7 @@ func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration ti
 	}
 	_, err = db.Exec(
 		query,
+		userId,
 		userId,
 		accessToken,
 		tokenExpiration,

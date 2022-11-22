@@ -21,6 +21,7 @@ table "categories" {
     columns = [column.id]
   }
 }
+
 table "library_items" {
   schema = schema.tweetyah
   column "id" {
@@ -64,6 +65,7 @@ table "library_items" {
     columns = [column.id]
   }
 }
+
 table "posts" {
   schema = schema.tweetyah
   column "id" {
@@ -132,6 +134,7 @@ table "posts" {
     columns = [column.id]
   }
 }
+
 table "user_settings" {
   schema = schema.tweetyah
   column "id" {
@@ -142,6 +145,7 @@ table "user_settings" {
     columns = [column.id]
   }
 }
+
 table "users" {
   schema = schema.tweetyah
   column "id" {
@@ -152,6 +156,7 @@ table "users" {
     columns = [column.id]
   }
 }
+
 table "user_tokens" {
   schema = schema.tweetyah
   column "id" {
@@ -179,6 +184,7 @@ table "user_tokens" {
     columns = [column.id]
   }
 }
+
 schema "tweetyah" {
   charset = "utf8mb4"
   collate = "utf8mb4_0900_ai_ci"

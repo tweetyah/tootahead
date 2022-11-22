@@ -2,6 +2,8 @@ module auth
 
 go 1.19
 
+replace github.com/tweetyah/lib => ../../../lib
+
 require (
 	github.com/aws/aws-lambda-go v1.35.0
 	github.com/bmorrisondev/go-utils v1.0.1
