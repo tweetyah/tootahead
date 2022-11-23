@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { navigateTo } from "svelte-router-spa";
-  import { setAuth } from '../store'
+  import { Service } from "../models";
+  import { service, setAuth } from '../store'
 
   onMount(async () => {
-    console.log(location)
-    console.log(document.referrer)
     let query = location.search
     query = query.replace("?", "")
     let spl = query.split("&")
@@ -28,6 +27,12 @@
 
     localStorage.setItem("auth", JSON.stringify(json))
     setAuth(json)
+
+    if(map["state"] === "twitter") {
+      service.set(Service.Twitter)
+    } else {
+      service.set(Service.Mastodon)
+    }
 
     navigateTo("/")
   })

@@ -1,8 +1,10 @@
 <script lang="ts">
-  import { auth } from '../store'
+  import { auth, service } from '../store'
   import NavLink from "./NavLink.svelte";
   import Button from './Button.svelte';
   import { navigateTo } from 'svelte-router-spa';
+  import { Service } from '../models';
+  import colors from '../colors';
 
   let name: string
   let handle : string
@@ -38,7 +40,12 @@
     <a>Login</a>
   {:else}
     <div class="bg-slate-600 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">
-      <img src={profilePicUrl} class="rounded-full m-0.5 w-[50px] h-[50px]" />
+      <div class="relative mr-1">
+        <img src={profilePicUrl} class="rounded-full m-0.5 w-[54px] border-white" style="border-width: 1px;" alt="avatar" />
+        <div class="grid content-center justify-center w-[20px] h-[20px] rounded-full absolute top-0 border-white" style={`background-color: ${$service === Service.Twitter ? colors.twitter : colors.mastodon }; border-width: 1px; right: -5px;`}>
+          <i style="font-size: 12px;" class={`bx bxl-${$service === Service.Twitter ? "twitter" : "mastodon"}`}></i>
+        </div>
+      </div>
       <div class="ml-1 flex flex-col">
         <span class="font-bold">{ name }</span>
         <span class="italic text-sm">{ handle }</span>

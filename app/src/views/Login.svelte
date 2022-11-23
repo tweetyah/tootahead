@@ -32,7 +32,7 @@
   <div class="bg-white border-1 rounded w-[300px]">
     <div class="w-full p-3 border-b-slate-50 border-b-2">
       <input bind:value={instanceUrl} class="w-full p-2 mb-2 rounded bg-slate-50" type="text" placeholder="Mastodon domain (ie; fosstodon.org)">
-      <button on:click={e => redirectToLogin(e)} class="w-full p-2 rounded text-white" style="background-color: #6364FF">Login with Mastodon</button>
+      <button on:click={redirectToLogin} class="w-full p-2 rounded text-white" style="background-color: #6364FF">Login with Mastodon</button>
     </div>
     <div class="p-3">
       <button on:click={loginWithTwitter} class="w-full p-2 rounded text-white" style="background-color: #1DA1F2">Login with Twitter</button>

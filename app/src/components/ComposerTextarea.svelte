@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { service } from "../store";
+  import textvars from "../textvars";
+
 	export let value = "";
 	export let minRows = 1;
 	export let maxRows: number = undefined;
@@ -13,7 +16,7 @@
 		style="min-height: {minHeight}; max-height: {maxHeight}"
 	>{value + '\n'}</pre>
 
-	<textarea bind:value placeholder="Tweet something..." class="w-full bg-inherit focus:outline-none"></textarea>
+	<textarea bind:value placeholder={textvars[$service]["post-box-placeholder"]} class="w-full bg-inherit focus:outline-none"></textarea>
 </div>
 
 <style>

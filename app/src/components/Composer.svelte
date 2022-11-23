@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Tweet } from "../models";
-  import { api } from "../store";
+  import { api, service } from "../store";
+  import textvars from "../textvars";
   import Accordion from "./Accordion.svelte";
   import AccordionNode from "./AccordionNode.svelte";
   import Button from "./Button.svelte";
@@ -51,12 +52,12 @@
             total={tweets.length} />
         {/each}
       </div>
-      <Button onClick={() => addTweet()} icon="bx-list-plus" title="Add tweet" />
+      <Button onClick={() => addTweet()} icon="bx-list-plus" title={textvars[$service]["add-post"]} />
       <Button onClick={() => saveTweets()} icon="bxs-save" title="Save" />
     </div>
     <div id="composer-preview">
       <Accordion>
-        <AccordionNode title="Send at" 
+        <AccordionNode title="Send at"
           subtitle="{sendAt.toLocaleDateString()} {sendAt.toLocaleTimeString()}">
           <div class="px-3">
             <SendAtScheduler bind:value={sendAt} />

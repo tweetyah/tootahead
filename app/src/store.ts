@@ -1,6 +1,8 @@
 import { writable } from 'svelte/store';
+import type { Service } from './models';
 import type { ApiService } from './services/ApiService';
 
+export const service = writable<Service>()
 export const auth = writable<any>();
 export const name = writable<string>();
 export const profileImgUrl = writable<string>();

@@ -25,7 +25,7 @@ export class Tweet{
     if(row.send_at) tweet.sendAt = new Date(row.send_at)
     if(row.retweet_at) tweet.retweetAt = new Date(row.retweet_at)
     return tweet
-  } 
+  }
 }
 
 export type Auth = {
@@ -45,4 +45,9 @@ export type Category = {
   id: number
   name: string
   color: string
+}
+
+export enum Service {
+  Twitter = 0,
+  Mastodon = 1
 }
