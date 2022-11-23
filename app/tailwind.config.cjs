@@ -7,5 +7,6 @@ module.exports = {
     extend: {},
   },
   plugins: [
+    require("tailwindcss-debug-screens")
   ],
 }

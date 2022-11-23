@@ -6,6 +6,9 @@
   import { Service } from '../models';
   import colors from '../colors';
 
+  export let closeButton: boolean
+  export let onClose: Function | undefined
+
   let name: string
   let handle : string
   let profilePicUrl: string
@@ -35,15 +38,20 @@
 
 </script>
 
-<div id="sidebar" class="shadow-sm flex flex-col justify-left h-100 w-[250px] m-2 p-2 rounded bg-slate-800 text-slate-100">
-  <div class="p-3 text-lg">Tweetyah!</div>
+<div id="sidebar" class="shadow-sm flex flex-col justify-left h-100 w-full m-2 p-2 rounded bg-slate-800 text-slate-100">
+  <div class="flex">
+    <div class="p-3 text-lg flex-1">Tweetyah!</div>
+    {#if closeButton}
+      <button on:click={() => onClose()}>
+        <i class="bx bx-x" style="font-size: 24px;" />
+      </button>
+    {/if}
+  </div>
   <hr class="border-slate-700 my-2" />
   <div class="flex-1 marker:flex flex-col">
     <NavLink title="Home" icon="bx-home" to="/" />
   </div>
-  {#if !isLoggedIn}
-    <a>Login</a>
-  {:else}
+  {#if isLoggedIn}
     <div class="bg-slate-600 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">
       <div class="relative mr-1">
         <img src={profilePicUrl} class="rounded-full m-0.5 w-[54px] border-white" style="border-width: 1px;" alt="avatar" />
@@ -56,8 +64,8 @@
         <span class="italic text-sm">{ handle }</span>
       </div>
     </div>
-    {/if}
-    <Button title="Log out" onClick={() => logout()} />
+  {/if}
+  <Button title="Log out" onClick={() => logout()} />
 
   <!-- <NavLink title="Library" icon="bx-collection" to="/library" /> -->
 </div>
