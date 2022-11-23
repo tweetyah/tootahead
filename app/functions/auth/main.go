@@ -38,6 +38,7 @@ type ResponseBody struct {
 	Name            string `json:"name"`
 	ProfileImageUrl string `json:"profile_image_url"`
 	Username        string `json:"username"`
+	Service         string `json:"service"`
 }
 
 func Post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -122,6 +123,7 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		Name:            userDetails.Data.Name,
 		ProfileImageUrl: userDetails.Data.ProfileImageUrl,
 		Username:        userDetails.Data.Username,
+		Service:         "twitter",
 	}
 	return &rv, nil
 }
@@ -158,6 +160,7 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		Name:            userDetails.DisplayName,
 		ProfileImageUrl: userDetails.Avatar,
 		Username:        userDetails.Username,
+		Service:         "mastodon",
 	}
 	return &rv, nil
 }

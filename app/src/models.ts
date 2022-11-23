@@ -1,4 +1,4 @@
-export class Tweet{
+export class Post{
   id?: number
   text?: string
   parentId?: string
@@ -11,12 +11,12 @@ export class Tweet{
     this.key = key
   }
 
-  static getHtml(tweet: Tweet) {
+  static getHtml(tweet: Post) {
     return tweet.text?.replace(/(?:\r\n|\r|\n)/g, '<br>')
   }
 
-  static fromDb(row: any): Tweet {
-    let tweet = new Tweet()
+  static fromDb(row: any): Post {
+    let tweet = new Post()
     tweet.id = row.id
     tweet.text = row.text
     tweet.parentId = row.tweet_parent

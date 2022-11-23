@@ -20,6 +20,11 @@
     name = value.name
     handle = value.username
     profilePicUrl = value.profile_image_url
+    if (value.service === "twitter") {
+      service.set(Service.Twitter)
+    } else {
+      service.set(Service.Mastodon)
+    }
     isLoggedIn = true
   })
 

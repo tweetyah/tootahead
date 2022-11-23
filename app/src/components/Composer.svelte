@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Tweet } from "../models";
+  import type { Post } from "../models";
   import { api, service } from "../store";
   import textvars from "../textvars";
   import Accordion from "./Accordion.svelte";
@@ -12,30 +12,30 @@
   let sendAt: Date = new Date()
   let retweetAt: Date
   let shouldRetweet: boolean
-  let tweets: Tweet[] = [{
+  let posts: Post[] = [{
     text: ""
   }]
 
   function addTweet() {
-    tweets = [...tweets, {
+    posts = [...posts, {
       text: ""
     }]
   }
 
   async function saveTweets() {
     // TODO: app or comp state
-    tweets.forEach(t => {
+    posts.forEach(t => {
       t.sendAt = sendAt
       if(shouldRetweet) {
         t.retweetAt = retweetAt
       }
     })
-    await $api.saveTweets(tweets)
+    await $api.savePosts(posts)
     reset()
   }
 
   function reset() {
-    tweets = [{
+    posts = [{
       text: ""
     }]
   }
@@ -45,11 +45,11 @@
   <div class="grid grid-cols-2 gap-2">
     <div id="composer-wrapper">
       <div class="bg-white shadow-sm rounded mb-2">
-        {#each tweets as t, idx}
+        {#each posts as p, idx}
           <ComposerCard
-            bind:tweet={t}
+            bind:post={p}
             index={idx}
-            total={tweets.length} />
+            total={posts.length} />
         {/each}
       </div>
       <Button onClick={() => addTweet()} icon="bx-list-plus" title={textvars[$service]["add-post"]} />

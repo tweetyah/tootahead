@@ -1,4 +1,4 @@
-import { Tweet } from "../models";
+import { Post } from "../models";
 import type { Category } from "../models";
 
 type Request = {
@@ -15,15 +15,15 @@ export class ApiService {
     this._token = token
   }
 
-  async fetchTweets(): Promise<Tweet[]> {
-    const res = await this.execute("get", "/tweets")
-    let tweets: Tweet[] = []
-    res.forEach((r: any) => tweets.push(Tweet.fromDb(r)))
-    return tweets
+  async fetchPosts(): Promise<Post[]> {
+    const res = await this.execute("get", "/posts")
+    let posts: Post[] = []
+    res.forEach((r: any) => posts.push(Post.fromDb(r)))
+    return posts
   }
 
-  async saveTweets(tweets: Tweet[]) {
-    return await this.execute("post", "/tweets", JSON.stringify(tweets))
+  async savePosts(posts: Post[]) {
+    return await this.execute("post", "/posts", JSON.stringify(posts))
   }
 
   async fetchCategories(): Promise<Category[]> {
