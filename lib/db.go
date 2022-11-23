@@ -40,18 +40,24 @@ func SavePostToDb(userId string, post Post) (*Post, error) {
 		return nil, errors.Wrap(err, "(SavePostToDb) GetDatabase")
 	}
 
+	log.Println(post)
+
 	query := "insert into posts (text, send_at, retweet_at, id_user) values (?, ?, ?, ?)"
 	results, err := db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.GetResendAtSqlTimestamp(), userId)
 	if err != nil {
 		return nil, errors.Wrap(err, "(SavePostToDb) db.Exec")
 	}
 
+	log.Println("after insert")
+
 	lastInserted, err := results.LastInsertId()
 	if err != nil {
 		return nil, errors.Wrap(err, "(SavePostToDb) result.LastInsertedId")
 	}
-
 	post.Id = &lastInserted
+
+	log.Println("returning", post)
+
 	return &post, nil
 }
 

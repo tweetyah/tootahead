@@ -1,7 +1,7 @@
 [build]
   command = "npm run build"
-  functions = "functions"
-  publish = "dist"
+  functions = "app/functions"
+  publish = "app/dist"
 
 [dev]
   targetPort = 5173
