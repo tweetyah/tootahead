@@ -2,6 +2,7 @@ package lib
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/pkg/errors"
@@ -109,10 +110,12 @@ func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
 }
 
 func GetUserBySocialLogin(providerType int, providerId string) (*User, error) {
-	query := `select u.user_id from users u 
-		left outer join auth_providers ap on ap.user_id = u.user_id 
+	query := `select u.id, u.last_login from users u 
+		left outer join auth_providers ap on ap.user_id = u.id 
 		where ap.type = ? and ap.service_id = ?
 		limit 1`
+
+	log.Println(query)
 
 	db, err := GetDatabase()
 	if err != nil {

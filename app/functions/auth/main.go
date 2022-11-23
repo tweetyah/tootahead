@@ -85,23 +85,6 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		return nil, errors.Wrap(err, "(BuildTwitterResponse) GetTwitterUserDetails")
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"twitter:access_token":      twitterAuthResp.AccessToken,
-		"twitter:refresh_token":     twitterAuthResp.RefreshToken,
-		"twitter:expires_in":        twitterAuthResp.ExpiresIn,
-		"twitter:user_id":           userDetails.Data.Id,
-		"twitter:username":          userDetails.Data.Username,
-		"twitter:profile_image_url": userDetails.Data.ProfileImageUrl,
-		"twitter:name":              userDetails.Data.Name,
-		"nbf":                       time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return nil, errors.Wrap(err, "(BuildTwitterResponse) token.SignedString")
-	}
-
 	idNum, err := strconv.Atoi(userDetails.Data.Id)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildTwitterResponse) convert user id to int")
@@ -121,6 +104,24 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "(BuildTwitterResponse) CreateUserFromSocialLogin")
 		}
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"twitter:access_token":      twitterAuthResp.AccessToken,
+		"twitter:refresh_token":     twitterAuthResp.RefreshToken,
+		"twitter:expires_in":        twitterAuthResp.ExpiresIn,
+		"twitter:user_id":           userDetails.Data.Id,
+		"twitter:username":          userDetails.Data.Username,
+		"twitter:profile_image_url": userDetails.Data.ProfileImageUrl,
+		"twitter:name":              userDetails.Data.Name,
+		"user_id":                   fmt.Sprint(*user.Id),
+		"nbf":                       time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		return nil, errors.Wrap(err, "(BuildTwitterResponse) token.SignedString")
 	}
 
 	rv := ResponseBody{
@@ -145,21 +146,6 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetMastodonUserDetails")
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"mastodon:access_token":      tokens.AccessToken,
-		"mastodon:user_id":           userDetails.ID,
-		"mastodon:username":          userDetails.Username,
-		"mastodon:profile_image_url": userDetails.Avatar,
-		"mastodon:name":              userDetails.DisplayName,
-		"nbf":                        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return nil, errors.Wrap(err, "(BuildMastodonResponse) token.SignedString")
-	}
-
 	user, err := lib.GetUserBySocialLogin(1, userDetails.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetUserBySocialLogin")
@@ -169,6 +155,22 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "(BuildMastodonResponse) CreateUserFromSocialLogin")
 		}
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"mastodon:access_token":      tokens.AccessToken,
+		"mastodon:user_id":           userDetails.ID,
+		"mastodon:username":          userDetails.Username,
+		"mastodon:profile_image_url": userDetails.Avatar,
+		"mastodon:name":              userDetails.DisplayName,
+		"user_id":                    fmt.Sprint(*user.Id),
+		"nbf":                        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		return nil, errors.Wrap(err, "(BuildMastodonResponse) token.SignedString")
 	}
 
 	rv := ResponseBody{
