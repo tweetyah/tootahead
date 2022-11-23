@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -33,10 +34,16 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 		return utils.ErrorResponse(err, "json.Unmarshal")
 	}
 
+	log.Println(posts)
+
 	userId := claims["user_id"].(string)
 
 	if len(posts) == 1 {
 		updated, err := lib.SavePostToDb(userId, posts[0])
+		if err != nil {
+			return utils.ErrorResponse(err, "(Post) save post to db")
+		}
+
 		jstr, err := utils.ConvertToJsonString(updated)
 		if err != nil {
 			return utils.ErrorResponse(err, "utils.ConvertToJsonString")
@@ -44,6 +51,10 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 		return utils.OkResponse(&jstr)
 	} else {
 		threadStart, err := lib.SaveThreadToDb(userId, posts)
+		if err != nil {
+			return utils.ErrorResponse(err, "(Post) save thread to db")
+		}
+
 		jstr, err := utils.ConvertToJsonString(threadStart)
 		if err != nil {
 			return utils.ErrorResponse(err, "(Post) utils.ConvertToJsonString")
