@@ -34,21 +34,17 @@ func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration ti
 	return nil
 }
 
-func SavePostToDb(userId string, post Post) (*Post, error) {
+func SavePostToDb(userId string, serviceId int, post Post) (*Post, error) {
 	db, err := GetDatabase()
 	if err != nil {
 		return nil, errors.Wrap(err, "(SavePostToDb) GetDatabase")
 	}
 
-	log.Println(post)
-
-	query := "insert into posts (text, send_at, retweet_at, id_user) values (?, ?, ?, ?)"
-	results, err := db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.GetResendAtSqlTimestamp(), userId)
+	query := "insert into posts (text, send_at, retweet_at, id_user, service) values (?, ?, ?, ?, ?)"
+	results, err := db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.GetResendAtSqlTimestamp(), userId, serviceId)
 	if err != nil {
 		return nil, errors.Wrap(err, "(SavePostToDb) db.Exec")
 	}
-
-	log.Println("after insert")
 
 	lastInserted, err := results.LastInsertId()
 	if err != nil {
@@ -61,7 +57,7 @@ func SavePostToDb(userId string, post Post) (*Post, error) {
 	return &post, nil
 }
 
-func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
+func SaveThreadToDb(userId string, serviceId int, posts []Post) (*Post, error) {
 	db, err := GetDatabase()
 	if err != nil {
 		return nil, errors.Wrap(err, "(SaveThreadToDb) GetDatabase")
@@ -69,7 +65,7 @@ func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
 
 	threadOrder := 1
 	threadCount := len(posts)
-	query := "insert into posts (text, is_thread, thread_order, thread_count, send_at, retweet_at, id_user) values (?, true, ?, ?, ?, ?, ?)"
+	query := "insert into posts (text, is_thread, thread_order, thread_count, send_at, retweet_at, id_user, service) values (?, true, ?, ?, ?, ?, ?, ?)"
 	threadStart := posts[0]
 	results, err := db.Exec(query,
 		threadStart.Text,
@@ -78,6 +74,7 @@ func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
 		threadStart.GetSendAtSqlTimestamp(),
 		threadStart.GetResendAtSqlTimestamp(),
 		userId,
+		serviceId,
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "(SaveThreadToDb) db.Exec threadstart")
@@ -90,7 +87,7 @@ func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
 	threadStart.ThreadCount = &threadCount
 
 	var params []interface{}
-	query = "insert into posts (text, is_thread, thread_order, thread_parent, send_at, retweet_at, id_user) values (?, true, ?, ?, ?, ?, ?)"
+	query = "insert into posts (text, is_thread, thread_order, thread_parent, send_at, retweet_at, id_user, service) values (?, true, ?, ?, ?, ?, ?, ?)"
 	for idx, el := range posts {
 		// Skip the first tweet since it was inserted earlier
 		if idx == 0 {
@@ -106,6 +103,7 @@ func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
 		params = append(params, el.GetSendAtSqlTimestamp())
 		params = append(params, el.GetResendAtSqlTimestamp())
 		params = append(params, userId)
+		params = append(params, serviceId)
 	}
 	_, err = db.Exec(query, params)
 	if err != nil {

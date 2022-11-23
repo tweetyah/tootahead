@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -37,9 +38,14 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 	log.Println(posts)
 
 	userId := claims["user_id"].(string)
+	service := claims["service_id"].(string)
+	serviceId, err := strconv.Atoi(service)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Post) cast service to num")
+	}
 
 	if len(posts) == 1 {
-		updated, err := lib.SavePostToDb(userId, posts[0])
+		updated, err := lib.SavePostToDb(userId, serviceId, posts[0])
 		if err != nil {
 			return utils.ErrorResponse(err, "(Post) save post to db")
 		}
@@ -50,7 +56,7 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 		}
 		return utils.OkResponse(&jstr)
 	} else {
-		threadStart, err := lib.SaveThreadToDb(userId, posts)
+		threadStart, err := lib.SaveThreadToDb(userId, serviceId, posts)
 		if err != nil {
 			return utils.ErrorResponse(err, "(Post) save thread to db")
 		}

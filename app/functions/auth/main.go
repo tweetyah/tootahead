@@ -115,6 +115,7 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		"twitter:profile_image_url": userDetails.Data.ProfileImageUrl,
 		"twitter:name":              userDetails.Data.Name,
 		"user_id":                   fmt.Sprint(*user.Id),
+		"service_id":                fmt.Sprint(lib.AUTH_PROVIDER_TWITTER),
 		"nbf":                       time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
 	})
 
@@ -164,6 +165,7 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		"mastodon:profile_image_url": userDetails.Avatar,
 		"mastodon:name":              userDetails.DisplayName,
 		"user_id":                    fmt.Sprint(*user.Id),
+		"service_id":                 fmt.Sprint(lib.AUTH_PROVIDER_MASTODON),
 		"nbf":                        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
 	})
 
