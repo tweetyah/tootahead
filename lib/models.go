@@ -26,3 +26,8 @@ func (p *Post) GetResendAtSqlTimestamp() *string {
 	}
 	return nil
 }
+
+type User struct {
+	Id        *int64
+	LastLogin time.Time
+}

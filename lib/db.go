@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/pkg/errors"
@@ -105,4 +106,61 @@ func SaveThreadToDb(userId string, posts []Post) (*Post, error) {
 	}
 
 	return &threadStart, nil
+}
+
+func GetUserBySocialLogin(providerType int, providerId string) (*User, error) {
+	query := `select u.user_id from users u 
+		left outer join auth_providers ap on ap.user_id = u.user_id 
+		where ap.type = ? and ap.service_id = ?
+		limit 1`
+
+	db, err := GetDatabase()
+	if err != nil {
+		return nil, errors.Wrap(err, "(GetUserBySocialLogin) GetDatabase")
+	}
+
+	row := db.QueryRow(query, providerType, providerId)
+
+	var record User
+	err = row.Scan(&record.Id, &record.LastLogin)
+	// User doesnt exist
+	if err != nil && err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "(GetUserBySocialLogin) row.Scan")
+	}
+
+	return &record, nil
+}
+
+func CreateUserFromSocialLogin(providerType int, providerId string) (*User, error) {
+	user := User{
+		LastLogin: time.Now(),
+	}
+
+	db, err := GetDatabase()
+	if err != nil {
+		return nil, errors.Wrap(err, "(CreateUser) GetDatabase")
+	}
+
+	query := "insert into users (last_login) values (?)"
+	res, err := db.Exec(query, SqlTimeStampFromTime(&user.LastLogin))
+	if err != nil {
+		return nil, errors.Wrap(err, "(CreatUser) insert into users")
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil, errors.Wrap(err, "(CreateUser) last inserted id")
+	}
+	user.Id = &id
+
+	query = "insert into auth_providers (user_id, type, service_id) values (?, ?, ?)"
+	_, err = db.Exec(query, id, providerType, providerId)
+	if err != nil {
+		return nil, errors.Wrap(err, "(CreateUser) insert into auth_providers")
+	}
+
+	return &user, nil
 }

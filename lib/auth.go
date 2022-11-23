@@ -7,6 +7,9 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+var AUTH_PROVIDER_TWITTER int = 0
+var AUTH_PROVIDER_MASTODON int = 1
+
 func ValidateToken(tokenStr string) (jwt.MapClaims, bool) {
 	hmacSecretString := os.Getenv("JWT_SECRET")
 	hmacSecret := []byte(hmacSecretString)

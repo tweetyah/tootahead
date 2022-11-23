@@ -151,6 +151,11 @@ table "users" {
   column "id" {
     null = false
     type = bigint
+    auto_increment = true
+  }
+  column "last_login" {
+    null = false
+    type = timestamp
   }
   primary_key {
     columns = [column.id]
@@ -183,6 +188,31 @@ table "user_tokens" {
   primary_key {
     columns = [column.id]
   }
+}
+
+table "auth_providers" {
+  schema = schema.tweetyah
+  column "id" {
+    null           = false
+    type           = int
+    auto_increment = true
+  }
+  column "user_id" {
+    null = false
+    type = int
+  }
+  column "type" {
+    null = false
+    type = int
+  }
+  column "service_id" {
+    null = false
+    type = varchar(50)
+  }
+  primary_key {
+    columns = [column.id]
+  }
+
 }
 
 schema "tweetyah" {

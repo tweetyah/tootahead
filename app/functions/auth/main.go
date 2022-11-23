@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -16,7 +16,6 @@ import (
 )
 
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-
 	if request.HTTPMethod == "POST" {
 		res, err := Post(request)
 		return &res, err
@@ -81,14 +80,10 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		return nil, errors.Wrap(err, "(BuildTwitterResponse) GetTwitterTokens")
 	}
 
-	log.Println("twitterAuthResp", twitterAuthResp)
-
 	userDetails, err := lib.GetTwitterUserDetails(twitterAuthResp.AccessToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildTwitterResponse) GetTwitterUserDetails")
 	}
-
-	log.Println("userDetails", userDetails)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"twitter:access_token":      twitterAuthResp.AccessToken,
@@ -117,9 +112,20 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		return nil, errors.Wrap(err, "(BuildTwitterResponse) SaveTwitterAccessToken")
 	}
 
+	user, err := lib.GetUserBySocialLogin(1, userDetails.Data.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "(BuildTwitterResponse) GetUserBySocialLogin")
+	}
+	if user == nil {
+		user, err = lib.CreateUserFromSocialLogin(lib.AUTH_PROVIDER_TWITTER, userDetails.Data.Id)
+		if err != nil {
+			return nil, errors.Wrap(err, "(BuildTwitterResponse) CreateUserFromSocialLogin")
+		}
+	}
+
 	rv := ResponseBody{
 		AccessToken:     tokenString,
-		Id:              userDetails.Data.Id,
+		Id:              fmt.Sprint(*user.Id),
 		Name:            userDetails.Data.Name,
 		ProfileImageUrl: userDetails.Data.ProfileImageUrl,
 		Username:        userDetails.Data.Username,
@@ -154,9 +160,20 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) token.SignedString")
 	}
 
+	user, err := lib.GetUserBySocialLogin(1, userDetails.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetUserBySocialLogin")
+	}
+	if user == nil {
+		user, err = lib.CreateUserFromSocialLogin(lib.AUTH_PROVIDER_MASTODON, userDetails.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, "(BuildMastodonResponse) CreateUserFromSocialLogin")
+		}
+	}
+
 	rv := ResponseBody{
 		AccessToken:     tokenString,
-		Id:              userDetails.ID,
+		Id:              fmt.Sprint(*user.Id),
 		Name:            userDetails.DisplayName,
 		ProfileImageUrl: userDetails.Avatar,
 		Username:        userDetails.Username,
