@@ -185,6 +185,10 @@ table "user_tokens" {
     null = true
     type = timestamp
   }
+  column "mastodon_domain" {
+    null = true
+    type = varchar(100)
+  }
   primary_key {
     columns = [column.id]
   }
@@ -212,7 +216,6 @@ table "auth_providers" {
   primary_key {
     columns = [column.id]
   }
-
 }
 
 schema "tweetyah" {

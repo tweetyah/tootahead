@@ -23,24 +23,32 @@ func main() {
 
 	for {
 		log.Println("checking for tweets")
-		rows := GetScheduledTweets()
+		rows := GetScheduledPosts()
 		log.Printf("found %v tweets!", len(rows))
 		users := RowsToUserTweets(rows)
 		for _, user := range users {
 			log.Printf("processing user %v", user.Id)
-			didUpdate, err := user.ValidateTokens()
-			if err != nil {
-				log.Fatal(err)
-			}
-			if didUpdate {
-				err = lib.SaveTwitterAccessToken(user.Id, *user.AccessToken, *user.AccessTokenExpiry, *user.RefreshToken)
+			if user.Service != nil && *user.Service == lib.AUTH_PROVIDER_TWITTER {
+				didUpdate, err := user.ValidateTokens()
 				if err != nil {
 					log.Fatal(err)
 				}
+				if didUpdate {
+					err = lib.SaveTwitterAccessToken(user.Id, *user.AccessToken, *user.AccessTokenExpiry, *user.RefreshToken)
+					if err != nil {
+						log.Fatal(err)
+					}
+				}
+
+				for _, p := range user.Posts {
+					HandleTweet(p, *user.AccessToken)
+				}
 			}
 
-			for _, t := range user.Tweets {
-				HandleTweet(t, *user.AccessToken)
+			if user.Service != nil && *user.Service == lib.AUTH_PROVIDER_MASTODON {
+				for _, p := range user.Posts {
+					HandleMastodonPost(p, *user.MastodonDomain, *user.AccessToken)
+				}
 			}
 
 			log.Printf("finished handling %v", user.Id)
@@ -50,7 +58,7 @@ func main() {
 	}
 }
 
-type GetScheduledTweetsDbResult struct {
+type GetScheduledPostsDbResult struct {
 	Id                int64
 	Text              *string
 	SendAt            *time.Time
@@ -63,6 +71,8 @@ type GetScheduledTweetsDbResult struct {
 	AccessToken       *string
 	RefreshToken      *string
 	AccessTokenExpiry *time.Time
+	Service           *int
+	MastodonDomain    *string
 }
 
 type User struct {
@@ -70,7 +80,9 @@ type User struct {
 	AccessToken       *string
 	RefreshToken      *string
 	AccessTokenExpiry *time.Time
-	Tweets            []TweetRecord
+	Posts             []PostRecord
+	Service           *int
+	MastodonDomain    *string
 }
 
 func (u *User) ValidateTokens() (bool, error) {
@@ -90,7 +102,7 @@ func (u *User) ValidateTokens() (bool, error) {
 	return false, nil
 }
 
-type TweetRecord struct {
+type PostRecord struct {
 	Id           int64
 	Text         *string
 	SendAt       *time.Time
@@ -101,7 +113,7 @@ type TweetRecord struct {
 	ThreadOrder  *int64
 }
 
-func RowsToUserTweets(rows []GetScheduledTweetsDbResult) map[int64]User {
+func RowsToUserTweets(rows []GetScheduledPostsDbResult) map[int64]User {
 	userMap := map[int64]User{}
 	for _, el := range rows {
 		if el.UserId == nil {
@@ -114,12 +126,14 @@ func RowsToUserTweets(rows []GetScheduledTweetsDbResult) map[int64]User {
 				AccessToken:       el.AccessToken,
 				RefreshToken:      el.RefreshToken,
 				AccessTokenExpiry: el.AccessTokenExpiry,
-				Tweets:            []TweetRecord{},
+				Posts:             []PostRecord{},
+				Service:           el.Service,
+				MastodonDomain:    el.MastodonDomain,
 			}
 		}
 
 		user := userMap[*el.UserId]
-		user.Tweets = append(userMap[*el.UserId].Tweets, TweetRecord{
+		user.Posts = append(userMap[*el.UserId].Posts, PostRecord{
 			Id:           el.Id,
 			Text:         el.Text,
 			SendAt:       el.SendAt,
@@ -135,7 +149,7 @@ func RowsToUserTweets(rows []GetScheduledTweetsDbResult) map[int64]User {
 }
 
 // Queries the database for all tweets to be sent
-func GetScheduledTweets() []GetScheduledTweetsDbResult {
+func GetScheduledPosts() []GetScheduledPostsDbResult {
 	query := `
 		select
 			t.id,
@@ -147,13 +161,15 @@ func GetScheduledTweets() []GetScheduledTweetsDbResult {
 			t.id_user,
 			t.thread_parent,
 			t.thread_order,
-			u.access_token,
-			u.refresh_token,
-			u.access_token_expiry
+			ut.access_token,
+			ut.refresh_token,
+			ut.access_token_expiry,
+			t.service,
+			ut.mastodon_domain
 		from
-			tweets t
+			posts p
 		left join
-			users u on t.id_user = u.id
+			user_tokens ut on p.id_user = ut.user_id
 		where
 			send_at < NOW() and id_sent is null and status = 0`
 	db, err := GetDatabase()
@@ -166,9 +182,9 @@ func GetScheduledTweets() []GetScheduledTweetsDbResult {
 		log.Fatal(err)
 	}
 
-	var rows []GetScheduledTweetsDbResult
+	var rows []GetScheduledPostsDbResult
 	for results.Next() {
-		var r GetScheduledTweetsDbResult
+		var r GetScheduledPostsDbResult
 		err := results.Scan(
 			&r.Id,
 			&r.Text,
@@ -182,6 +198,8 @@ func GetScheduledTweets() []GetScheduledTweetsDbResult {
 			&r.AccessToken,
 			&r.RefreshToken,
 			&r.AccessTokenExpiry,
+			&r.Service,
+			&r.MastodonDomain,
 		)
 		if err != nil {
 			log.Fatal(err)
@@ -194,7 +212,7 @@ func GetScheduledTweets() []GetScheduledTweetsDbResult {
 }
 
 // Sends a tweet and updates the db record
-func HandleTweet(t TweetRecord, accessToken string) {
+func HandleTweet(t PostRecord, accessToken string) {
 	log.Printf("processing tweet %v", t.Id)
 	db, err := GetDatabase()
 	if err != nil {
@@ -206,18 +224,43 @@ func HandleTweet(t TweetRecord, accessToken string) {
 		log.Fatal(err)
 	}
 	if results.IsSuccess {
-		query := "update tweets set id_sent = ?, status = 1 where id = ?"
+		query := "update posts set id_sent = ?, status = 1 where id = ?"
 		_, err = db.Exec(query, results.SentId, t.Id)
 		if err != nil {
 			log.Fatal(err)
 		}
 	} else {
 		// TODO: Update this to forward error to Discord
-		query := "update tweets set status = 2, error = ? where id = ?"
+		query := "update posts set status = 2, error = ? where id = ?"
 		_, err = db.Exec(query, results.Status, t.Id)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	log.Printf("Tweet %v processed successfully!", t.Id)
+	log.Printf("Post %v processed successfully!", t.Id)
+}
+
+func HandleMastodonPost(p PostRecord, instanceDomain string, accessToken string) {
+	db, err := GetDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := lib.SendMastodonPost(*p.Text, instanceDomain, accessToken)
+	if results.IsSuccess {
+		query := "update posts set id_sent = ?, status = 1 where id = ?"
+		_, err = db.Exec(query, results.SentId, p.Id)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		// TODO: Update this to forward error to Discord
+		query := "update posts set status = 2, error = ? where id = ?"
+		_, err = db.Exec(query, results.Status, p.Id)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	log.Printf("Post %v processed successfully!", p.Id)
+
 }

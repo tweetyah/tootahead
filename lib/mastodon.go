@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -124,4 +125,49 @@ type MastodonGetUserResponse struct {
 		Value      string    `json:"value"`
 		VerifiedAt time.Time `json:"verified_at"`
 	} `json:"fields"`
+}
+
+func SendMastodonPost(instanceDomain string, text string, accessToken string) (*SendMastodonPostResults, error) {
+	data := url.Values{
+		"status": {text},
+	}
+	mastodonUrl := fmt.Sprintf("https://%v/api/v1/statuses", instanceDomain)
+
+	req, err := http.NewRequest("POST", mastodonUrl, strings.NewReader(data.Encode()))
+	if err != nil {
+		return nil, errors.Wrap(err, "(SendMastodonPost) http.NewRequest")
+	}
+
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", accessToken))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "(SendMastodonPost) client.Do")
+	}
+	defer resp.Body.Close()
+	bodyText, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "(SendMastodonPost) ioutil.ReadAll")
+	}
+
+	log.Println(string(bodyText))
+
+	return nil, nil
+
+	// var resp MastodonSendPostResponse
+	// err = json.Unmarshal([]byte(bodyText), &resp)
+	// if err != nil {
+	// 	return nil, errors.Wrap(err, "(SendMastodonPost) json.Unmarshal")
+	// }
+	// return &authResp, nil
+}
+
+type MastodonSendPostResponse struct {
+}
+
+type SendMastodonPostResults struct {
+	SentId    *int64
+	IsSuccess bool
+	Status    *string
 }
