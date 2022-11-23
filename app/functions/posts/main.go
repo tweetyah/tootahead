@@ -35,17 +35,21 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 		return utils.ErrorResponse(err, "json.Unmarshal")
 	}
 
-	log.Println(posts)
+	log.Println(claims)
 
 	userId := claims["user_id"].(string)
-	service := claims["service_id"].(string)
-	serviceId, err := strconv.Atoi(service)
+	serviceId := claims["service_id"].(string)
+	serviceIdNum, err := strconv.Atoi(serviceId)
 	if err != nil {
-		return utils.ErrorResponse(err, "(Post) cast service to num")
+		return utils.ErrorResponse(err, "(Post) cast service id to num")
+	}
+	userIdNum, err := strconv.Atoi(userId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Post) cast user id to num")
 	}
 
 	if len(posts) == 1 {
-		updated, err := lib.SavePostToDb(userId, serviceId, posts[0])
+		updated, err := lib.SavePostToDb(userIdNum, serviceIdNum, posts[0])
 		if err != nil {
 			return utils.ErrorResponse(err, "(Post) save post to db")
 		}
@@ -56,7 +60,7 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 		}
 		return utils.OkResponse(&jstr)
 	} else {
-		threadStart, err := lib.SaveThreadToDb(userId, serviceId, posts)
+		threadStart, err := lib.SaveThreadToDb(userIdNum, serviceIdNum, posts)
 		if err != nil {
 			return utils.ErrorResponse(err, "(Post) save thread to db")
 		}

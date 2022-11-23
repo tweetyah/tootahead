@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Post } from "../models";
-  import { api, service } from "../store";
+  import { alert, api, service } from "../store";
   import textvars from "../textvars";
   import Accordion from "./Accordion.svelte";
   import AccordionNode from "./AccordionNode.svelte";
@@ -36,6 +36,10 @@
     })
     await $api.savePosts(posts)
     reset()
+    alert.set({
+      title: "Post saved",
+      body: "You're post was scheduled successfully!"
+    })
   }
 
   function reset() {

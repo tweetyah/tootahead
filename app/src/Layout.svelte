@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Route } from 'svelte-router-spa'
+  import AlertLayer from './components/AlertLayer.svelte';
   import Navbar from './components/Navbar.svelte';
   import Sidebar from './components/Sidebar.svelte';
   export let currentRoute
@@ -14,4 +15,5 @@
   <main class="flex-1 p-2">
     <Route {currentRoute} {params} />
   </main>
+  <AlertLayer />
 </div>

@@ -1,8 +1,9 @@
 import { writable } from 'svelte/store';
-import { Service } from './models';
+import { Service, type Alert } from './models';
 import type { ApiService } from './services/ApiService';
 
 export const service = writable<Service>(Service.Twitter)
+export const alert = writable<Alert>()
 export const auth = writable<any>();
 export const name = writable<string>();
 export const profileImgUrl = writable<string>();

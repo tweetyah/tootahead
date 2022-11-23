@@ -107,16 +107,16 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"twitter:access_token":      twitterAuthResp.AccessToken,
-		"twitter:refresh_token":     twitterAuthResp.RefreshToken,
-		"twitter:expires_in":        twitterAuthResp.ExpiresIn,
-		"twitter:user_id":           userDetails.Data.Id,
-		"twitter:username":          userDetails.Data.Username,
-		"twitter:profile_image_url": userDetails.Data.ProfileImageUrl,
-		"twitter:name":              userDetails.Data.Name,
-		"user_id":                   fmt.Sprint(*user.Id),
-		"service_id":                fmt.Sprint(lib.AUTH_PROVIDER_TWITTER),
-		"nbf":                       time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+		// "twitter:access_token":      twitterAuthResp.AccessToken,
+		// "twitter:refresh_token":     twitterAuthResp.RefreshToken,
+		// "twitter:expires_in":        twitterAuthResp.ExpiresIn,
+		// "twitter:user_id":           userDetails.Data.Id,
+		// "twitter:username":          userDetails.Data.Username,
+		// "twitter:profile_image_url": userDetails.Data.ProfileImageUrl,
+		// "twitter:name":              userDetails.Data.Name,
+		"user_id":    fmt.Sprint(*user.Id),
+		"service_id": fmt.Sprint(lib.AUTH_PROVIDER_TWITTER),
+		"nbf":        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -159,14 +159,14 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"mastodon:access_token":      tokens.AccessToken,
-		"mastodon:user_id":           userDetails.ID,
-		"mastodon:username":          userDetails.Username,
-		"mastodon:profile_image_url": userDetails.Avatar,
-		"mastodon:name":              userDetails.DisplayName,
-		"user_id":                    fmt.Sprint(*user.Id),
-		"service_id":                 fmt.Sprint(lib.AUTH_PROVIDER_MASTODON),
-		"nbf":                        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+		// "mastodon:access_token":      tokens.AccessToken,
+		// "mastodon:user_id":           userDetails.ID,
+		// "mastodon:username":          userDetails.Username,
+		// "mastodon:profile_image_url": userDetails.Avatar,
+		// "mastodon:name":              userDetails.DisplayName,
+		"user_id":    fmt.Sprint(*user.Id),
+		"service_id": fmt.Sprint(lib.AUTH_PROVIDER_MASTODON),
+		"nbf":        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret

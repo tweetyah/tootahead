@@ -70,7 +70,7 @@ table "posts" {
   schema = schema.tweetyah
   column "id" {
     null           = false
-    type           = int
+    type           = bigint
     auto_increment = true
   }
   column "text" {
@@ -107,7 +107,7 @@ table "posts" {
   }
   column "thread_parent" {
     null = true
-    type = int
+    type = bigint
   }
   column "thread_order" {
     null = true

@@ -51,3 +51,8 @@ export enum Service {
   Twitter = 0,
   Mastodon = 1
 }
+
+export type Alert = {
+  title: string
+  body: string
+}
