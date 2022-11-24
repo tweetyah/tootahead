@@ -25,6 +25,7 @@
     "vite": "^3.2.0"
   },
   "dependencies": {
-    "svelte-router-spa": "^6.0.3"
+    "svelte-router-spa": "^6.0.3",
+    "svelte-textarea-autoresize": "^1.0.0"
   }
 }

@@ -19,12 +19,14 @@
   <div>
     <img src={ $profileImgUrl } class="w-[50px] h-[50px] rounded-full m-2" alt="avatar" />
   </div>
-  <div class="flex-1 m-2">
+  <div class="flex-1 m-2 min-w-0">
     <div>
       <span class="font-bold">{ $name }</span>
       <span class="italic text-slate-600 text-sm">@{ $handle }</span>
     </div>
-    <ComposerTextarea bind:value={post.text} />
+    <div class="w-full">
+      <ComposerTextarea bind:value={post.text} />
+    </div>
     <div class="flex text-sm align-center text-slate-600">
       <div class="flex-1">
         <span class="mr-2">{ post.text.length }/240</span>
