@@ -116,6 +116,7 @@
             Save to library opt
           </AccordionNode> -->
         </Accordion>
+        <Button onClick={() => saveTweets()} icon="bxs-save" title="Save" />
       </div>
     </div>
   {/if}
