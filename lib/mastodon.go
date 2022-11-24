@@ -171,3 +171,12 @@ type SendMastodonPostResults struct {
 	IsSuccess bool
 	Status    *string
 }
+
+func RegisterMastodonApp(domain string) (*MastodonAppRegistration, error) {
+	url := fmt.Sprintf("https://%v/api/v1/apps")
+	opts := FetchOptions{}
+	res, err := Fetch()
+}
+
+type MastodonAppRegistration struct {
+}

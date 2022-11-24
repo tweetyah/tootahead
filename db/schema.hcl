@@ -218,6 +218,30 @@ table "auth_providers" {
   }
 }
 
+table "mastodon_apps" {
+  schema = schema.tweetyah
+  column "id" {
+    null           = false
+    type           = int
+    auto_increment = true
+  }
+  column "domain" {
+    null = false
+    type = varchar(100)
+  }
+  column "client_id" {
+    null = false
+    type = varchar(500)
+  }
+  column "client_secret" {
+    null = false
+    type = varchar(500)
+  }
+  column "redirect_uri" {
+    null = false
+    type = varchar(100)
+  }
+}
 schema "tweetyah" {
   charset = "utf8mb4"
   collate = "utf8mb4_0900_ai_ci"
