@@ -1,9 +1,14 @@
 build:
+	GOOS=linux GOARCH=amd64 go build -o dist/scheduler .
 	docker build --tag tweetyah-scheduler:latest .
 
 run: build
 	docker rm -f tweetyah-scheduler
 	docker run --name tweetyah-scheduler tweetyah-scheduler:latest
+
+start: build
+	docker rm -f tweetyah-scheduler
+	docker run -d --name tweetyah-scheduler tweetyah-scheduler:latest
 
 deploy:
 	aws lightsail push-container-image --region us-east-1 --service-name tweetyah-scheduler --label tweetyah-scheduler --image tweetyah-scheduler:latest
