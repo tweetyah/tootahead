@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -132,44 +131,93 @@ func SendMastodonPost(instanceDomain string, text string, accessToken string) (*
 		"status": {text},
 	}
 	mastodonUrl := fmt.Sprintf("https://%v/api/v1/statuses", instanceDomain)
-
-	req, err := http.NewRequest("POST", mastodonUrl, strings.NewReader(data.Encode()))
+	opts := FetchOptions{
+		Method:   "POST",
+		FormData: &data,
+		Headers: map[string]string{
+			"Authorization": fmt.Sprintf("Bearer %v", accessToken),
+		},
+	}
+	res, err := Fetch(mastodonUrl, &opts)
 	if err != nil {
-		return nil, errors.Wrap(err, "(SendMastodonPost) http.NewRequest")
+		return nil, errors.Wrap(err, "(SendMastodonPost) fetch")
 	}
 
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %v", accessToken))
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	var resp SendMastodonPostResults
+	err = res.MarshalJson(&resp)
 	if err != nil {
-		return nil, errors.Wrap(err, "(SendMastodonPost) client.Do")
+		return nil, errors.Wrap(err, "(SendMastodonPost) marshal json")
 	}
-	defer resp.Body.Close()
-	bodyText, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "(SendMastodonPost) ioutil.ReadAll")
-	}
-
-	log.Println(string(bodyText))
-
-	return nil, nil
-
-	// var resp MastodonSendPostResponse
-	// err = json.Unmarshal([]byte(bodyText), &resp)
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "(SendMastodonPost) json.Unmarshal")
-	// }
-	// return &authResp, nil
-}
-
-type MastodonSendPostResponse struct {
+	return &resp, nil
 }
 
 type SendMastodonPostResults struct {
-	SentId    *int64
-	IsSuccess bool
-	Status    *string
+	ID                 string        `json:"id"`
+	CreatedAt          time.Time     `json:"created_at"`
+	InReplyToID        interface{}   `json:"in_reply_to_id"`
+	InReplyToAccountID interface{}   `json:"in_reply_to_account_id"`
+	Sensitive          bool          `json:"sensitive"`
+	SpoilerText        string        `json:"spoiler_text"`
+	Visibility         string        `json:"visibility"`
+	Language           string        `json:"language"`
+	URI                string        `json:"uri"`
+	URL                string        `json:"url"`
+	RepliesCount       int           `json:"replies_count"`
+	ReblogsCount       int           `json:"reblogs_count"`
+	FavouritesCount    int           `json:"favourites_count"`
+	EditedAt           interface{}   `json:"edited_at"`
+	Favourited         bool          `json:"favourited"`
+	Reblogged          bool          `json:"reblogged"`
+	Muted              bool          `json:"muted"`
+	Bookmarked         bool          `json:"bookmarked"`
+	Pinned             bool          `json:"pinned"`
+	Content            string        `json:"content"`
+	Filtered           []interface{} `json:"filtered"`
+	Reblog             interface{}   `json:"reblog"`
+	Application        struct {
+		Name    string `json:"name"`
+		Website string `json:"website"`
+	} `json:"application"`
+	Account struct {
+		ID             string    `json:"id"`
+		Username       string    `json:"username"`
+		Acct           string    `json:"acct"`
+		DisplayName    string    `json:"display_name"`
+		Locked         bool      `json:"locked"`
+		Bot            bool      `json:"bot"`
+		Discoverable   bool      `json:"discoverable"`
+		Group          bool      `json:"group"`
+		CreatedAt      time.Time `json:"created_at"`
+		Note           string    `json:"note"`
+		URL            string    `json:"url"`
+		Avatar         string    `json:"avatar"`
+		AvatarStatic   string    `json:"avatar_static"`
+		Header         string    `json:"header"`
+		HeaderStatic   string    `json:"header_static"`
+		FollowersCount int       `json:"followers_count"`
+		FollowingCount int       `json:"following_count"`
+		StatusesCount  int       `json:"statuses_count"`
+		LastStatusAt   string    `json:"last_status_at"`
+		Noindex        bool      `json:"noindex"`
+		Emojis         []struct {
+			Shortcode       string `json:"shortcode"`
+			URL             string `json:"url"`
+			StaticURL       string `json:"static_url"`
+			VisibleInPicker bool   `json:"visible_in_picker"`
+		} `json:"emojis"`
+		Fields []struct {
+			Name       string      `json:"name"`
+			Value      string      `json:"value"`
+			VerifiedAt interface{} `json:"verified_at"`
+		} `json:"fields"`
+	} `json:"account"`
+	MediaAttachments []interface{} `json:"media_attachments"`
+	Mentions         []interface{} `json:"mentions"`
+	Tags             []interface{} `json:"tags"`
+	Emojis           []interface{} `json:"emojis"`
+	Card             interface{}   `json:"card"`
+	Poll             interface{}   `json:"poll"`
+	Error            *string       `json:"error"`
 }
 
 func RegisterMastodonApp(domain string) (*MastodonAppRegistration, error) {

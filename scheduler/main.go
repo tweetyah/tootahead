@@ -171,7 +171,7 @@ func GetScheduledPosts() []GetScheduledPostsDbResult {
 		left join
 			user_tokens ut on p.id_user = ut.user_id
 		where
-			send_at < NOW() and id_sent is null and status = 0`
+			status = 0 and send_at < NOW()`
 	db, err := GetDatabase()
 	if err != nil {
 		log.Fatal(err)
@@ -246,20 +246,20 @@ func HandleMastodonPost(p PostRecord, instanceDomain string, accessToken string)
 		log.Fatal(err)
 	}
 
-	results, err := lib.SendMastodonPost(*p.Text, instanceDomain, accessToken)
+	results, err := lib.SendMastodonPost(instanceDomain, *p.Text, accessToken)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if results.IsSuccess {
+	if results.Error == nil {
 		query := "update posts set id_sent = ?, status = 1 where id = ?"
-		_, err = db.Exec(query, results.SentId, p.Id)
+		_, err = db.Exec(query, results.ID, p.Id)
 		if err != nil {
 			log.Fatal(err)
 		}
 	} else {
 		// TODO: Update this to forward error to Discord
 		query := "update posts set status = 2, error = ? where id = ?"
-		_, err = db.Exec(query, results.Status, p.Id)
+		_, err = db.Exec(query, *results.Error, p.Id)
 		if err != nil {
 			log.Fatal(err)
 		}

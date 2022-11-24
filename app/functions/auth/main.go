@@ -141,22 +141,15 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 	}
 	// TODO: end ===
 
-	log.Println("clientId", clientId)
-	log.Println("clientSecret", clientSecret)
-
 	tokens, err := lib.GetMastodonTokens(instanceDomain, code, clientId, clientSecret)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetMastodonTokens")
 	}
 
-	log.Println("tokens", tokens)
-
 	userDetails, err := lib.GetMastodonUserDetails(instanceDomain, tokens.AccessToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetMastodonUserDetails")
 	}
-
-	log.Println("userDetails", userDetails)
 
 	user, err := lib.GetUserBySocialLogin(1, userDetails.ID)
 	if err != nil {
@@ -168,6 +161,8 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 			return nil, errors.Wrap(err, "(BuildMastodonResponse) CreateUserFromSocialLogin")
 		}
 	}
+
+	err = lib.SaveMastodonAccessToken(*user.Id, tokens.AccessToken, instanceDomain)
 
 	tokenStr, err := MintJwt(*user.Id, lib.AUTH_PROVIDER_MASTODON)
 	if err != nil {

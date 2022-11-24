@@ -192,6 +192,9 @@ table "user_tokens" {
   primary_key {
     columns = [column.id]
   }
+  key {
+    columns = [column.user_id]
+  }
 }
 
 table "auth_providers" {

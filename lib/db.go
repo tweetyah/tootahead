@@ -10,7 +10,7 @@ import (
 
 func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration time.Time, refreshToken string) error {
 	query := `insert into user_tokens
-			(id, user_id, access_token, access_token_expiry, refresh_token) values (?, ?, ?, ?, ?)
+			(user_id, access_token, access_token_expiry, refresh_token) values (?, ?, ?, ?)
 		on duplicate key update
 			access_token = ?, access_token_expiry = ?, refresh_token = ?`
 	db, err := GetDatabase()
@@ -19,7 +19,6 @@ func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration ti
 	}
 	_, err = db.Exec(
 		query,
-		userId,
 		userId,
 		accessToken,
 		tokenExpiration,
@@ -30,6 +29,25 @@ func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration ti
 	)
 	if err != nil {
 		return errors.Wrap(err, "(SaveTwitterAccessToken) db.Exec")
+	}
+	return nil
+}
+
+func SaveMastodonAccessToken(userId int64, accessToken string, domain string) error {
+	query := `insert into user_tokens
+		(user_id, access_token, mastodon_domain)
+		values (?, ?, ?)
+		on duplicate key update
+		access_token = ?, mastodon_domain = ?`
+
+	db, err := GetDatabase()
+	if err != nil {
+		return errors.Wrap(err, "(SaveMastodonAccessToken) get database")
+	}
+
+	_, err = db.Exec(query, userId, accessToken, domain, accessToken, domain)
+	if err != nil {
+		return errors.Wrap(err, "(SaveMastodonAccessToken) exec query")
 	}
 	return nil
 }
