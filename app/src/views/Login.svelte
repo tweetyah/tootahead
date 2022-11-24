@@ -1,12 +1,17 @@
 <script lang="ts">
   let instanceUrl;
 
-  async function loginToMastodon(domain: string) {
-    let _base = "/.netlify/functions"
-
-    let res = await fetch("/.netlify/functions/mastodon_app", {
-
-    })
+  async function loginToMastodon() {
+    let res = await fetch(`/.netlify/functions/mastodon_app?domain=${instanceUrl}`)
+    let json = await res.json()
+    let url = `https://${instanceUrl}/oauth/authorize?`
+    url += `&client_id=${json.clientId}`
+    url += `&redirect_uri=${import.meta.env.VITE_REDIRECT_URI}`
+    url += `&scope=read write follow`
+    url += '&grant_type=authorization_code'
+    url += '&response_type=code'
+    url += '&state=' + instanceUrl
+    location.href = url
   }
 
   function redirectToLogin() {
@@ -40,7 +45,7 @@
   <div class="bg-white border-1 rounded w-[300px]">
     <div class="w-full p-3 border-b-slate-50 border-b-2">
       <input bind:value={instanceUrl} class="w-full p-2 mb-2 rounded bg-slate-50" type="text" placeholder="Mastodon domain (ie; fosstodon.org)">
-      <button on:click={redirectToLogin} class="w-full p-2 rounded text-white" style="background-color: #6364FF">Login with Mastodon</button>
+      <button on:click={() => loginToMastodon()} class="w-full p-2 rounded text-white" style="background-color: #6364FF">Login with Mastodon</button>
     </div>
     <div class="p-3">
       <!-- <button on:click={loginWithTwitter} class="w-full p-2 rounded text-white" style="background-color: #1DA1F2">Login with Twitter</button> -->

@@ -11,20 +11,24 @@ import (
 )
 
 type NetlifyRouter struct {
-	Get    func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
-	Post   func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
-	Put    func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
-	Patch  func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
-	Delete func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
+	AllowAnonymous bool
+	Get            func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
+	Post           func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
+	Put            func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
+	Patch          func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
+	Delete         func(events.APIGatewayProxyRequest, jwt.MapClaims, *sql.DB) (events.APIGatewayProxyResponse, error)
 }
 
 func (nr *NetlifyRouter) Handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	authHeader := request.Headers["authorization"]
-	authHeader = strings.Replace(authHeader, "Bearer ", "", 1)
-
-	claims, isLoggedIn := ValidateToken(authHeader)
-	if !isLoggedIn {
-		return utils.UnauthorizedResponse(nil)
+	var claims jwt.MapClaims
+	if !nr.AllowAnonymous {
+		authHeader := request.Headers["authorization"]
+		authHeader = strings.Replace(authHeader, "Bearer ", "", 1)
+		c, isLoggedIn := ValidateToken(authHeader)
+		if !isLoggedIn {
+			return utils.UnauthorizedResponse(nil)
+		}
+		claims = c
 	}
 
 	db, err := GetDatabase()

@@ -14,7 +14,8 @@ import (
 
 func main() {
 	router := lib.NetlifyRouter{
-		Get: Get,
+		AllowAnonymous: true,
+		Get:            Get,
 	}
 	lambda.Start(router.Handler)
 }
@@ -29,15 +30,10 @@ func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB
 
 	// lookup in the db if we have those tokens, return them if so
 	query := `select client_id from mastodon_apps where domain = ? and redirect_uri = ? limit 1`
-
-	db, err := lib.GetDatabase()
-	if err != nil {
-		log.Fatal(err)
-	}
 	res := db.QueryRow(query, domain, os.Getenv("VITE_REDIRECT_URI"))
 
 	var response ResponseBody
-	err = res.Scan(&response.ClientId)
+	err := res.Scan(&response.ClientId)
 	if err != nil && err == sql.ErrNoRows {
 		requiresAppRegistration = true
 	}
@@ -48,8 +44,24 @@ func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB
 
 	// if not, register an app on that server, store the secrets, and return them
 	if requiresAppRegistration {
-		appRegsitration, err := lib.RegisterMastodonApp(domain)
+		app, err := lib.RegisterMastodonApp(domain)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		query = `insert into mastodon_apps
+			(domain, client_id, client_secret, redirect_uri)
+			values (?, ?, ?, ?)`
+		_, err = db.Exec(query, domain, app.ClientID, app.ClientSecret, os.Getenv("VITE_REDIRECT_URI"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		response.ClientId = app.ClientID
 	}
 
-	return utils.OkResponse(nil)
+	jstr, err := utils.ConvertToJsonString(response)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Get) marshal response body")
+	}
+	return utils.OkResponse(&jstr)
 }

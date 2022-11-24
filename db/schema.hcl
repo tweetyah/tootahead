@@ -241,6 +241,9 @@ table "mastodon_apps" {
     null = false
     type = varchar(100)
   }
+  primary_key {
+    columns = [column.id]
+  }
 }
 schema "tweetyah" {
   charset = "utf8mb4"

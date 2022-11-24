@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -106,27 +107,13 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 		}
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		// "twitter:access_token":      twitterAuthResp.AccessToken,
-		// "twitter:refresh_token":     twitterAuthResp.RefreshToken,
-		// "twitter:expires_in":        twitterAuthResp.ExpiresIn,
-		// "twitter:user_id":           userDetails.Data.Id,
-		// "twitter:username":          userDetails.Data.Username,
-		// "twitter:profile_image_url": userDetails.Data.ProfileImageUrl,
-		// "twitter:name":              userDetails.Data.Name,
-		"user_id":    fmt.Sprint(*user.Id),
-		"service_id": fmt.Sprint(lib.AUTH_PROVIDER_TWITTER),
-		"nbf":        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	tokenStr, err := MintJwt(*user.Id, lib.AUTH_PROVIDER_TWITTER)
 	if err != nil {
-		return nil, errors.Wrap(err, "(BuildTwitterResponse) token.SignedString")
+		return nil, errors.Wrap(err, "(BuildTwitterResponse) mint jwt")
 	}
 
 	rv := ResponseBody{
-		AccessToken:     tokenString,
+		AccessToken:     *tokenStr,
 		Id:              fmt.Sprint(*user.Id),
 		Name:            userDetails.Data.Name,
 		ProfileImageUrl: userDetails.Data.ProfileImageUrl,
@@ -137,15 +124,39 @@ func BuildTwitterResponse(code string) (*ResponseBody, error) {
 }
 
 func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
-	tokens, err := lib.GetMastodonTokens(instanceDomain, code)
+
+	// TODO: Move this into lib
+	var clientId string
+	var clientSecret string
+	query := "select client_id, client_secret from mastodon_apps where domain = ? and redirect_uri = ? limit 1"
+	db, err := lib.GetDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res := db.QueryRow(query, instanceDomain, os.Getenv("VITE_REDIRECT_URI"))
+	err = res.Scan(&clientId, &clientSecret)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// TODO: end ===
+
+	log.Println("clientId", clientId)
+	log.Println("clientSecret", clientSecret)
+
+	tokens, err := lib.GetMastodonTokens(instanceDomain, code, clientId, clientSecret)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetMastodonTokens")
 	}
+
+	log.Println("tokens", tokens)
 
 	userDetails, err := lib.GetMastodonUserDetails(instanceDomain, tokens.AccessToken)
 	if err != nil {
 		return nil, errors.Wrap(err, "(BuildMastodonResponse) GetMastodonUserDetails")
 	}
+
+	log.Println("userDetails", userDetails)
 
 	user, err := lib.GetUserBySocialLogin(1, userDetails.ID)
 	if err != nil {
@@ -158,25 +169,13 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		}
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		// "mastodon:access_token":      tokens.AccessToken,
-		// "mastodon:user_id":           userDetails.ID,
-		// "mastodon:username":          userDetails.Username,
-		// "mastodon:profile_image_url": userDetails.Avatar,
-		// "mastodon:name":              userDetails.DisplayName,
-		"user_id":    fmt.Sprint(*user.Id),
-		"service_id": fmt.Sprint(lib.AUTH_PROVIDER_MASTODON),
-		"nbf":        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	tokenStr, err := MintJwt(*user.Id, lib.AUTH_PROVIDER_MASTODON)
 	if err != nil {
-		return nil, errors.Wrap(err, "(BuildMastodonResponse) token.SignedString")
+		return nil, errors.Wrap(err, "(BuildMastodonResponse) mint jwt")
 	}
 
 	rv := ResponseBody{
-		AccessToken:     tokenString,
+		AccessToken:     *tokenStr,
 		Id:              fmt.Sprint(*user.Id),
 		Name:            userDetails.DisplayName,
 		ProfileImageUrl: userDetails.Avatar,
@@ -184,4 +183,19 @@ func BuildMastodonResponse(instanceDomain, code string) (*ResponseBody, error) {
 		Service:         "mastodon",
 	}
 	return &rv, nil
+}
+
+func MintJwt(userId int64, serviceId int) (*string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id":    fmt.Sprint(userId),
+		"service_id": fmt.Sprint(serviceId),
+		"nbf":        time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		return nil, errors.Wrap(err, "(MintJwt) token.SignedString")
+	}
+	return &tokenString, err
 }
