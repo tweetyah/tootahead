@@ -40,6 +40,7 @@
       title: "Post saved",
       body: "You're post was scheduled successfully!"
     })
+    isMobileDrawerOpen = false
   }
 
   function reset() {

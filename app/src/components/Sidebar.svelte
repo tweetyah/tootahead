@@ -66,7 +66,6 @@
     </div>
   {/if}
   <Button title="Log out" onClick={() => logout()} />
-  <button on:click={() => alert.set({ title: "test alert", body: "this is a test" })}>test alert</button>
 
   <!-- <NavLink title="Library" icon="bx-collection" to="/library" /> -->
 </div>
