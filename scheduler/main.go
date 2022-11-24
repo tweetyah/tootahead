@@ -40,9 +40,9 @@ func main() {
 					}
 				}
 
-				for _, p := range user.Posts {
-					HandleTweet(p, *user.AccessToken)
-				}
+				// for _, p := range user.Posts {
+				// 	HandleTweet(p, *user.AccessToken)
+				// }
 			}
 
 			if user.Service != nil && *user.Service == lib.AUTH_PROVIDER_MASTODON {
@@ -152,19 +152,19 @@ func RowsToUserTweets(rows []GetScheduledPostsDbResult) map[int64]User {
 func GetScheduledPosts() []GetScheduledPostsDbResult {
 	query := `
 		select
-			t.id,
-			t.text,
-			t.send_at,
-			t.retweet_at,
-			t.is_thread,
-			t.thread_count,
-			t.id_user,
-			t.thread_parent,
-			t.thread_order,
+			p.id,
+			p.text,
+			p.send_at,
+			p.retweet_at,
+			p.is_thread,
+			p.thread_count,
+			p.id_user,
+			p.thread_parent,
+			p.thread_order,
 			ut.access_token,
 			ut.refresh_token,
 			ut.access_token_expiry,
-			t.service,
+			p.service,
 			ut.mastodon_domain
 		from
 			posts p
@@ -247,6 +247,9 @@ func HandleMastodonPost(p PostRecord, instanceDomain string, accessToken string)
 	}
 
 	results, err := lib.SendMastodonPost(*p.Text, instanceDomain, accessToken)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if results.IsSuccess {
 		query := "update posts set id_sent = ?, status = 1 where id = ?"
 		_, err = db.Exec(query, results.SentId, p.Id)

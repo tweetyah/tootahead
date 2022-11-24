@@ -1,6 +1,14 @@
 <script lang="ts">
   let instanceUrl;
 
+  async function loginToMastodon(domain: string) {
+    let _base = "/.netlify/functions"
+
+    let res = await fetch("/.netlify/functions/mastodon_app", {
+
+    })
+  }
+
   function redirectToLogin() {
     let url = `https://${instanceUrl}/oauth/authorize?`
     url += `&client_id=${import.meta.env.VITE_MASTODON_CLIENT_ID}`
@@ -35,7 +43,7 @@
       <button on:click={redirectToLogin} class="w-full p-2 rounded text-white" style="background-color: #6364FF">Login with Mastodon</button>
     </div>
     <div class="p-3">
-      <button on:click={loginWithTwitter} class="w-full p-2 rounded text-white" style="background-color: #1DA1F2">Login with Twitter</button>
+      <!-- <button on:click={loginWithTwitter} class="w-full p-2 rounded text-white" style="background-color: #1DA1F2">Login with Twitter</button> -->
     </div>
   </div>
 </div>
