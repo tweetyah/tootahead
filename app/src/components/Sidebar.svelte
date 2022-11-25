@@ -40,7 +40,7 @@
 
 <div id="sidebar" class="shadow-sm flex flex-col justify-left h-100 w-full m-2 p-2 rounded bg-slate-800 text-slate-100">
   <div class="flex">
-    <div class="p-3 text-lg flex-1">Tweetyah!</div>
+    <div class="p-3 text-lg flex-1">TootAhead</div>
     {#if closeButton}
       <button on:click={() => onClose()}>
         <i class="bx bx-x" style="font-size: 24px;" />
