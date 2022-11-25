@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bmorrisondev/go-utils"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -259,7 +260,11 @@ func HandleMastodonPost(p PostRecord, instanceDomain string, accessToken string)
 	} else {
 		// TODO: Update this to forward error to Discord
 		query := "update posts set status = 2, error = ? where id = ?"
-		_, err = db.Exec(query, *results.Error, p.Id)
+		jstr, err := utils.ConvertToJsonString(results)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = db.Exec(query, jstr, p.Id)
 		if err != nil {
 			log.Fatal(err)
 		}
