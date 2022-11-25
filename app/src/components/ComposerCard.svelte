@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Post } from "../models";
+  import { text } from "svelte/internal";
+import type { Post } from "../models";
   import { name, handle, profileImgUrl } from "../store";
   import Button from "./Button.svelte";
   import ComposerTextarea from "./ComposerTextarea.svelte";
@@ -8,6 +9,7 @@
   export let post: Post;
   export let index: number;
   export let total: number;
+  export let onUpdate: Function = undefined
 
   // Functions
   function selectImage() {
@@ -25,11 +27,11 @@
       <span class="italic text-slate-600 text-sm">@{ $handle }</span>
     </div>
     <div class="w-full">
-      <ComposerTextarea bind:value={post.text} />
+      <ComposerTextarea bind:value={post.text} onUpdate={onUpdate} />
     </div>
     <div class="flex text-sm align-center text-slate-600">
       <div class="flex-1">
-        <span class="mr-2">{ post.text.length }/240</span>
+        <span class="mr-2">{ post.text ? post.text.length : 0 }/240</span>
         {#if total > 1}
           <span class="mr-2">#{ index + 1 }/{total}</span>
         {/if}

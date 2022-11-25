@@ -3,14 +3,15 @@
   export let onClick:Function
   export let icon: string = ""
   export let variant: string = ""
+  export let disabled: boolean = false
 
   let classes = variant === "outlined" ?
     "bg-inherit hover:bg-slate-100 border-[1px] border-slate-800" :
-    "bg-slate-800 text-slate-50 hover:bg-slate-600";
+    "bg-slate-800 text-slate-50 hover:bg-slate-600 disabled:bg-slate-600 cursor-not-allowed";
 </script>
 
 
-<button class="{classes} shadow-sm rounded p-1 text-sm" on:click={() => onClick()}>
+<button class="{classes} shadow-sm rounded p-1 text-sm" on:click={() => onClick()} disabled={disabled}>
   {#if icon !== ""}
     <i class="bx {icon}"></i>
   {/if}

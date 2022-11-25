@@ -28,7 +28,7 @@
   function setDate(date: Date) {
     let dateStr = `${date.getFullYear()}-`
     dateStr += date.getMonth() < 10 ? `0${date.getMonth()}-` : `${date.getMonth()}-`
-    dateStr += date.getDay() < 10 ? `0${date.getDate()}` : `${date.getDay()}-`
+    dateStr += date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`
     let timeStr = date.getHours() < 10 ? `0${date.getHours()}:` : `${date.getHours()}:`
     timeStr += date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`
     value = date
@@ -40,6 +40,8 @@
     let min = range.start
     let max = range.end
     let seconds = Math.floor(Math.random() * (max - min + 1) + min)
+    // Set it to the minute by removing the remaining seconds
+    seconds = seconds - (seconds % 60)
     const newDate = new Date(
       value.getFullYear(),
       value.getMonth(),
