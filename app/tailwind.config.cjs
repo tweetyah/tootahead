@@ -16,6 +16,7 @@ module.exports = {
       indigo: colors.indigo,
       yellow: colors.yellow,
       slate: colors.slate,
+      red: colors.red,
       mastodon: '#595AFF',
       'mastodon-disabled': '#a2a2fa',
       'mastodon-hover': '#3839c9',

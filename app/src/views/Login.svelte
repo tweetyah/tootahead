@@ -67,8 +67,8 @@
   </div>
   <div class="bg-white border-1 rounded w-[300px] mb-2 shadow-sm">
     <div class="w-full p-3 border-b-slate-50 border-b-2">
-      <label class="font-bold text-sm" for="insanceUrl">Mastodon URL:</label>
-      <input name="instanceUrl" bind:value={instanceUrl} on:keypress={e => e.key === "Enter" ? validateMastodonInstance() : null} class="w-full p-2 mb-2 rounded bg-slate-50" type="text" placeholder="ex: fosstodon.org">
+      <label class="font-bold text-sm" for="insanceUrl">Mastodon URL <span class="text-red-600">*</span></label>
+      <input name="instanceUrl" bind:value={instanceUrl} on:keypress={e => e.key === "Enter" ? validateMastodonInstance() : null} class="w-full p-2 mb-2 rounded bg-slate-50 border border-gray-200 shadow-sm" type="text" placeholder="ex: fosstodon.org">
       <button on:click={() => validateMastodonInstance()}
         class="w-full p-2 rounded text-white disabled:cursor-not-allowed login-btn bg-mastodon disabled:bg-mastodon-disabled"
         disabled={isLoginDisabled}>
