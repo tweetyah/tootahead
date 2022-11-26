@@ -20,7 +20,7 @@ func GetMastodonTokens(instanceDomain, code, clientId, clientSecret string) (*Ma
 		"client_id":     {clientId},
 		"client_secret": {clientSecret},
 		"redirect_uri":  {os.Getenv("VITE_REDIRECT_URI")},
-		"scope":         {"read write follow"},
+		"scope":         {"read:accounts write:statuses"},
 	}
 
 	mastodonUrl := fmt.Sprintf("https://%v/oauth/token", instanceDomain)
@@ -222,10 +222,10 @@ type SendMastodonPostResults struct {
 
 func RegisterMastodonApp(domain string) (*MastodonAppRegistration, error) {
 	formData := url.Values{
-		"client_name":   {"Tweetyah"},
+		"client_name":   {"TootAhead"},
 		"redirect_uris": {os.Getenv("VITE_REDIRECT_URI")},
-		"scopes":        {"read write follow"},
-		"website":       {"https://tweetyah.com"},
+		"scopes":        {"read:accounts write:statuses"},
+		"website":       {"https://tootahead.com"},
 	}
 	url := fmt.Sprintf("https://%v/api/v1/apps", domain)
 	opts := FetchOptions{
