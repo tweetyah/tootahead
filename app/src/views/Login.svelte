@@ -23,6 +23,7 @@
       let res = await fetch(url)
       let json = await res.json()
       if(json && json.version) {
+        localStorage.setItem('instance', JSON.stringify(json))
         await loginToMastodon()
       } else {
         isMastodonInstanceInvalid = true

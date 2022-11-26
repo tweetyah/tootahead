@@ -9,7 +9,7 @@
 
 <div class="h-full w-full flex sm:flex-row flex-col">
   <Navbar />
-  <div class="h-0 sm:h-full flex sm:w-auto w-0 invisible sm:visible">
+  <div class="h-0 sm:h-full flex sm:w-[300px] w-0 invisible sm:visible">
     <Sidebar />
   </div>
   <main class="flex-1 p-2">

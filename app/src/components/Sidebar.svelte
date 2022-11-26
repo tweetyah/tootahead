@@ -5,6 +5,7 @@
   import { navigateTo } from 'svelte-router-spa';
   import { Service } from '../models';
   import colors from '../colors';
+  import UsernameLabel from './UsernameLabel.svelte';
 
   export let closeButton: boolean
   export let onClose: Function | undefined
@@ -63,7 +64,8 @@
         </div>
       </div>
       <div class="ml-1 flex flex-col">
-        <span class="font-bold">{ name }</span>
+        <UsernameLabel class="font-bold" name={name} />
+        <!-- <span class="font-bold">{ name }</span> -->
         <span class="italic text-sm">{ handle }</span>
       </div>
     </div>
