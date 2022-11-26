@@ -61,8 +61,9 @@
 </script>
 
 <div class="grid justify-center content-center">
-  <div class="mt-20">
-    <!-- <h1>Login</h1> -->
+  <div class="p-3 flex-1 flex text-2xl mt-20">
+    <img src="/img/logo.png" alt="logo" class="w-[30px] h-auto mr-2"/>
+    <span>TootAhead!</span>
   </div>
   <div class="bg-white border-1 rounded w-[300px] mb-2">
     <div class="w-full p-3 border-b-slate-50 border-b-2">
