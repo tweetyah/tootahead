@@ -13,6 +13,7 @@
       setAuth(auth)
 
       api.set(new ApiService(auth.access_token))
+      console.log($api)
     }
   })
 </script>

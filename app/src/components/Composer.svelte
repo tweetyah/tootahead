@@ -74,8 +74,14 @@
   let isSaveDisabled = true
   function calcIsSaveDisabled() {
     let isDisabled = false
-    posts.forEach(p => !p.text ? isDisabled = true : null )
-    if(sendAt < new Date()) isDisabled = true
+    posts.forEach(p => {
+      if(!p.text) {
+        isDisabled = true
+      }
+    })
+    if(sendAt < new Date()) {
+      isDisabled = true
+    }
     isSaveDisabled = isDisabled
   }
 

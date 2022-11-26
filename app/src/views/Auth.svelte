@@ -2,7 +2,8 @@
   import { onMount } from "svelte";
   import { navigateTo } from "svelte-router-spa";
   import { Service } from "../models";
-  import { service, setAuth } from '../store'
+  import { ApiService } from "../services/ApiService";
+  import { api, service, setAuth } from '../store'
 
   onMount(async () => {
     let query = location.search
@@ -27,6 +28,7 @@
 
     localStorage.setItem("auth", JSON.stringify(json))
     setAuth(json)
+    api.set(new ApiService(json.access_token))
 
     if(map["state"] === "twitter") {
       service.set(Service.Twitter)
