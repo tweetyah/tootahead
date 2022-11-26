@@ -100,7 +100,7 @@
 </script>
 
 <div class="mb-2 p-2">
-  <div class="border-[1px] border-slate-300 rounded p-1 flex gap-4">
+  <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
     <input class="focus:outline-0" type="date" bind:value={_date} on:change={onDateInputChanged} />
     <input class="focus:outline-0" type="time" bind:value={_time} on:change={onTimeInputChanged}/>
   </div>

@@ -38,9 +38,12 @@
 
 </script>
 
-<div id="sidebar" class="shadow-sm flex flex-col justify-left h-100 w-full m-2 p-2 rounded bg-slate-800 text-slate-100">
+<div id="sidebar" class="shadow-sm flex flex-col justify-left h-100 w-full m-2 p-2 rounded bg-dark1 text-slate-100">
   <div class="flex">
-    <div class="p-3 text-lg flex-1">TootAhead</div>
+    <div class="p-3 flex-1 flex text-2xl">
+      <img src="/img/logo.png" alt="logo" class="w-[30px] h-auto mr-2"/> 
+      <span>TootAhead!</span>
+    </div>
     {#if closeButton}
       <button on:click={() => onClose()}>
         <i class="bx bx-x" style="font-size: 24px;" />
@@ -52,7 +55,7 @@
     <NavLink title="Home" icon="bx-home" to="/" />
   </div>
   {#if isLoggedIn}
-    <div class="bg-slate-600 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">
+    <div class="bg-dark2 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">
       <div class="relative mr-1">
         <img src={profilePicUrl} class="rounded-full m-0.5 w-[54px] border-white" style="border-width: 1px;" alt="avatar" />
         <div class="grid content-center justify-center w-[20px] h-[20px] rounded-full absolute top-0 border-white" style={`background-color: ${$service === Service.Twitter ? colors.twitter : colors.mastodon }; border-width: 1px; right: -5px;`}>

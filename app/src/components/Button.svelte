@@ -6,8 +6,8 @@
   export let disabled: boolean = false
 
   let classes = variant === "outlined" ?
-    "bg-inherit hover:bg-slate-100 border-[1px] border-slate-800" :
-    "bg-slate-800 text-slate-50 hover:bg-slate-600 disabled:bg-slate-600 disabled:cursor-not-allowed";
+    "bg-inherit hover:bg-mastodon-hover hover:text-white border-[1px] border-mastodon" :
+    "bg-mastodon text-white hover:bg-mastodon-hover disabled:bg-mastodon-disabled disabled:cursor-not-allowed";
 </script>
 
 

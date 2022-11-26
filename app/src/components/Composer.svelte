@@ -143,7 +143,7 @@
 
   <button
     on:click={() => (isMobileDrawerOpen = true)}
-    class="visible sm:invisible shadow-sm hover:shadow-xl hover:bg-slate-800 absolute right-5 bottom-5 rounded-full round-full bg-slate-900 text-white grid justify-center content-center h-[48px] w-[48px] disabled:bg-slate-600 disabled:cursor-not-allowed"
+    class="visible sm:invisible shadow-sm hover:shadow-xl hover:bg-mastodon-hover absolute right-5 bottom-5 rounded-full round-full bg-mastodon text-white grid justify-center content-center h-[48px] w-[48px] disabled:bg-mastodon-disabled disabled:cursor-not-allowed"
     style="font-size: 32px;"
     disabled={isMobileDrawerDisabled}
   >
@@ -156,7 +156,7 @@
       class="absolute top-0 left-0 bottom-0 right-0 bg-slate-100 flex flex-col"
       style="z-index: 1000;"
     >
-      <div class="bg-slate-800 w-full p-4 shadow-sm text-slate-50 flex">
+      <div class="bg-dark1 w-full p-4 shadow-sm text-slate-50 flex text-lg">
         <span class="flex-1">Send post</span>
         <button
           style="font-size: 18px;"

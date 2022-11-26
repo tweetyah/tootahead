@@ -68,7 +68,7 @@
     <div class="w-full p-3 border-b-slate-50 border-b-2">
       <input bind:value={instanceUrl} class="w-full p-2 mb-2 rounded bg-slate-50" type="text" placeholder="Mastodon domain (ie; fosstodon.org)">
       <button on:click={() => validateMastodonInstance()}
-        class="w-full p-2 rounded text-white disabled:cursor-not-allowed login-btn"
+        class="w-full p-2 rounded text-white disabled:cursor-not-allowed login-btn bg-mastodon disabled:bg-mastodon-disabled"
         disabled={isLoginDisabled}>
         {#if isCheckingDomain}
           <i class='bx bx-loader-alt bx-spin' ></i>
@@ -90,12 +90,3 @@
     </div>
   {/if}
 </div>
-
-<style>
-.login-btn {
-  background-color: #6364FF
-}
-.login-btn:disabled {
-  background-color: #a2a2fa !important;
-}
-</style>
