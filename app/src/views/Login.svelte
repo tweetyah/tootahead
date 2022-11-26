@@ -67,7 +67,7 @@
   </div>
   <div class="bg-white border-1 rounded w-[300px] mb-2">
     <div class="w-full p-3 border-b-slate-50 border-b-2">
-      <input bind:value={instanceUrl} class="w-full p-2 mb-2 rounded bg-slate-50" type="text" placeholder="Mastodon domain (ie; fosstodon.org)">
+      <input bind:value={instanceUrl} on:keypress={e => e.key === "Enter" ? validateMastodonInstance() : null} class="w-full p-2 mb-2 rounded bg-slate-50" type="text" placeholder="Mastodon domain (ie; fosstodon.org)">
       <button on:click={() => validateMastodonInstance()}
         class="w-full p-2 rounded text-white disabled:cursor-not-allowed login-btn bg-mastodon disabled:bg-mastodon-disabled"
         disabled={isLoginDisabled}>
