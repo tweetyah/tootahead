@@ -41,7 +41,7 @@
 <div id="sidebar" class="shadow-sm flex flex-col justify-left h-100 w-full m-2 p-2 rounded bg-dark1 text-slate-100">
   <div class="flex">
     <div class="p-3 flex-1 flex text-2xl">
-      <img src="/img/logo.png" alt="logo" class="w-[30px] h-auto mr-2"/> 
+      <img src="/img/logo.png" alt="logo" class="w-[30px] h-auto mr-2"/>
       <span>TootAhead!</span>
     </div>
     {#if closeButton}
@@ -50,7 +50,7 @@
       </button>
     {/if}
   </div>
-  <hr class="border-slate-700 my-2" />
+  <hr class="border-dark2 my-2" />
   <div class="flex-1 marker:flex flex-col">
     <NavLink title="Home" icon="bx-home" to="/" />
   </div>

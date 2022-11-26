@@ -7,7 +7,8 @@
   export let title: string
 </script>
 
-<button on:click={() => navigateTo(to)} class="rounded hover:bg-slate-700 p-3 text-lg text-left hover:text-slate-200">
+<button on:click={() => navigateTo(to)}
+  class="rounded hover:bg-dark3 p-3 text-lg text-left w-full">
   {#if icon}
     <i class="bx {icon}"></i>
   {/if}{ title }
