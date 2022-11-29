@@ -6,11 +6,20 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
 )
 
+var _db *sql.DB
+
 func GetDatabase() (*sql.DB, error) {
-	db, err := sql.Open("mysql", os.Getenv("DSN"))
-	return db, err
+	if _db == nil {
+		db, err := sql.Open("mysql", os.Getenv("DSN"))
+		if err != nil {
+			return nil, errors.Wrap(err, "(GetDatabase) failed to open")
+		}
+		_db = db
+	}
+	return _db, nil
 }
 
 func SqlTimeStampFromTime(t *time.Time) *string {
