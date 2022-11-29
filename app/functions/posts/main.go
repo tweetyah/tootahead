@@ -22,10 +22,29 @@ func main() {
 }
 
 func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       "hello world!",
-	}, nil
+	var posts []lib.Post
+
+	query := "select id, text, send_at, text, status from posts where id_user = ?"
+	res, err := db.Query(query, claims["user_id"])
+	if err != nil {
+		return utils.ErrorResponse(err, "query db")
+	}
+
+	for res.Next() {
+		var p lib.Post
+		err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Text, &p.Status)
+		if err != nil {
+			return utils.ErrorResponse(err, "scan")
+		}
+		posts = append(posts, p)
+	}
+
+	jstr, err := utils.ConvertToJsonString(posts)
+	if err != nil {
+		return utils.ErrorResponse(err, "conver to json string")
+	}
+
+	return utils.OkResponse(&jstr)
 }
 
 func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {

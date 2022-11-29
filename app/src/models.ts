@@ -4,7 +4,7 @@ export class Post{
   parentId?: string
   key?: string
   sendAt?: Date
-  retweetAt?: Date
+  resendAt?: Date
   threadCount?: number
 
   constructor(key?: string) {
@@ -22,8 +22,10 @@ export class Post{
     tweet.parentId = row.tweet_parent
     tweet.threadCount = row.thread_count
     // TODO: Convert UTC to local time here
-    if(row.send_at) tweet.sendAt = new Date(row.send_at)
-    if(row.retweet_at) tweet.retweetAt = new Date(row.retweet_at)
+    console.log(row)
+    if(row.sendAt) tweet.sendAt = new Date(row.sendAt)
+    if(row.resendAt) tweet.resendAt = new Date(row.resendAt)
+    console.log(tweet)
     return tweet
   }
 }
