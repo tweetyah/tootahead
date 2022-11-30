@@ -11,6 +11,7 @@ import (
 	utils "github.com/bmorrisondev/go-utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/tweetyah/lib"
+	"github.com/tweetyah/lib/constants"
 )
 
 func main() {
@@ -25,19 +26,53 @@ func main() {
 func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
 	var posts []lib.Post
 
-	query := "select id, text, send_at, text, status from posts where id_user = ?"
-	res, err := db.Query(query, claims["user_id"])
-	if err != nil {
-		return utils.ErrorResponse(err, "query db")
-	}
+	filter := request.QueryStringParameters["filter"]
 
-	for res.Next() {
-		var p lib.Post
-		err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Text, &p.Status)
+	if filter == "scheduled" {
+		query := "select id, text, send_at, status from posts where id_user = ? and status = ?"
+		res, err := db.Query(query, claims["user_id"], constants.PostStatus_Scheduled)
 		if err != nil {
-			return utils.ErrorResponse(err, "scan")
+			return utils.ErrorResponse(err, "query db")
 		}
-		posts = append(posts, p)
+
+		for res.Next() {
+			var p lib.Post
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			if err != nil {
+				return utils.ErrorResponse(err, "scan")
+			}
+			posts = append(posts, p)
+		}
+	} else if filter == "sent" {
+		query := "select id, text, send_at, status from posts where id_user = ? and status = ?"
+		res, err := db.Query(query, claims["user_id"], constants.PostStatus_Sent)
+		if err != nil {
+			return utils.ErrorResponse(err, "query db")
+		}
+
+		for res.Next() {
+			var p lib.Post
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			if err != nil {
+				return utils.ErrorResponse(err, "scan")
+			}
+			posts = append(posts, p)
+		}
+	} else {
+		query := "select id, text, send_at, status from posts where id_user = ?"
+		res, err := db.Query(query, claims["user_id"])
+		if err != nil {
+			return utils.ErrorResponse(err, "query db")
+		}
+
+		for res.Next() {
+			var p lib.Post
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			if err != nil {
+				return utils.ErrorResponse(err, "scan")
+			}
+			posts = append(posts, p)
+		}
 	}
 
 	jstr, err := utils.ConvertToJsonString(posts)

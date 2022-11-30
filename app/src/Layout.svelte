@@ -12,7 +12,7 @@
   <div class="h-0 sm:h-full flex sm:w-[300px] w-0 invisible sm:visible">
     <Sidebar />
   </div>
-  <main class="flex-1 p-2">
+  <main class="flex-1">
     <Route {currentRoute} {params} />
   </main>
   <AlertLayer />

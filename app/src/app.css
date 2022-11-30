@@ -5,16 +5,20 @@
 body {
   height: 100vh;
   width: 100vw;
+  @apply bg-bglight;
 }
 
 #app {
   height: 100%;
   width: 100%;
-  @apply bg-bglight;
 }
 
 h1 {
-  @apply text-3xl -scroll-mb-10;
+  @apply text-3xl -scroll-mb-10 mb-2;
+}
+
+h2 {
+  @apply text-xl my-1;
 }
 
 .toggle-checkbox:checked {

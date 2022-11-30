@@ -15,8 +15,19 @@ export class ApiService {
     this._token = token
   }
 
-  async fetchPosts(): Promise<Post[]> {
-    const res = await this.execute("get", "/posts")
+  async fetchPosts(filter?: string): Promise<Post[]> {
+    let path = "/posts"
+    if(filter) {
+      path += `?filter=${filter}`
+    }
+    const res = await this.execute("get", path)
+    let posts: Post[] = []
+    res.forEach((r: any) => posts.push(Post.fromDb(r)))
+    return posts
+  }
+
+  async fetchScheduledPosts(): Promise<Post[]> {
+    const res = await this.execute("get", "/posts?filter=scheduled")
     let posts: Post[] = []
     res.forEach((r: any) => posts.push(Post.fromDb(r)))
     return posts

@@ -3,12 +3,20 @@
   import ComposerModal from "./ComposerModal.svelte";
 
   export let post: Post;
+  export let editable: boolean = false
   let isModalOpen: boolean = false;
+
+  function openModal() {
+    if(editable) {
+      isModalOpen = true
+    }
+  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div>
-  <div on:click={() => isModalOpen = true} class="my-2 p-2 bg-white border-border border rounded-sm shadow-sm flex flex-col hover:bg-gray-100 hover:cursor-pointer">
+  <div on:click={() => openModal()}
+    class="my-2 p-2 bg-white border-border border rounded-sm shadow-sm flex flex-col {editable ? "hover:bg-gray-100 hover:cursor-pointer" : null}">
     <div class="mb-2">
       { @html post.html() }
     </div>

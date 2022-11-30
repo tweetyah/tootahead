@@ -57,6 +57,7 @@
     <NavHeader>Posts</NavHeader>
     <NavLink title="Home" icon="bx-home" to="/" />
     <NavLink title="Scheduled" icon="bx-time" to="/scheduled" />
+    <NavLink title="Sent" icon="bx-check-double" to="/sent" />
   </div>
   {#if isLoggedIn}
     <div class="bg-dark2 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">
