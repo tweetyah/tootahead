@@ -46,6 +46,18 @@
     }
   }
 
+  async function deletePosts() {
+    await $api.deletePosts(posts)
+    reset()
+    alert.set({
+      title: "Post deleted",
+      body: "You're post was deleted successfully!"
+    })
+    if (onUpdated) {
+      onUpdated()
+    }
+  }
+
   function reset() {
     posts = [{
       text: ""
@@ -106,12 +118,17 @@
           </AccordionNode>
         </Accordion>
       </div>
-      <div class="flex">
+      <div class="flex gap-2">
         <Button
           onClick={() => update()}
           icon="bxs-save"
           title="Update"
           disabled={isSaveDisabled}
+        />
+        <Button
+          onClick={() => deletePosts()}
+          icon="bxs-trash"
+          title="Delete"
         />
       </div>
     </div>

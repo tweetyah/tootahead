@@ -41,6 +41,10 @@ export class ApiService {
     return await this.execute("put", `/posts`, JSON.stringify(posts), true)
   }
 
+  async deletePosts(posts: Post[]) {
+    return await this.execute("delete", `/posts`, JSON.stringify(posts), true)
+  }
+
   async fetchCategories(): Promise<Category[]> {
     return await this.execute("get", "/categories")
   }
@@ -64,6 +68,9 @@ export class ApiService {
       req.body = body
     }
     let res = await fetch(`${this._base}${path}`, req)
+    if(res.status < 200 || 299 < res.status ) {
+      throw new Error("(ApiService.execute) non-success status code", res)
+    }
     if(!ignoreResponseBody) {
       return await res.json()
     }
