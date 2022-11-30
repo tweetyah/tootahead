@@ -70,8 +70,6 @@ func SavePostToDb(userId int, serviceId int, post Post) (*Post, error) {
 	}
 	post.Id = &lastInserted
 
-	log.Println("returning", post)
-
 	return &post, nil
 }
 
@@ -134,6 +132,39 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 	}
 
 	return &threadStart, nil
+}
+
+func UpdatePostInDb(userId int, serviceId int, post Post) error {
+	db, err := GetDatabase()
+	if err != nil {
+		return errors.Wrap(err, "(UpdatePostInDb) GetDatabase")
+	}
+
+	query := "update posts set text = ?, send_at = ? where id = ?"
+	_, err = db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.Id)
+	if err != nil {
+		return errors.Wrap(err, "(UpdatePostInDb) db.Exec")
+	}
+
+	return nil
+}
+
+func UpdateThreadInDb(userId int, serviceId int, posts []Post) error {
+	db, err := GetDatabase()
+	if err != nil {
+		return errors.Wrap(err, "(UpdatePostInDb) GetDatabase")
+	}
+
+	// TODO: do this in a transaction
+	query := "update posts set text = ?, send_at = ? where id = ?"
+	for _, post := range posts {
+		_, err = db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.Id)
+		if err != nil {
+			return errors.Wrap(err, "(UpdatePostInDb) db.Exec")
+		}
+	}
+
+	return nil
 }
 
 func GetUserBySocialLogin(providerType int, providerId string) (*User, error) {

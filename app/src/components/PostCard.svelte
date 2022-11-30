@@ -10,7 +10,7 @@
 <div>
   <div on:click={() => isModalOpen = true} class="my-2 p-2 bg-white border-border border rounded-sm shadow-sm flex flex-col hover:bg-gray-100 hover:cursor-pointer">
     <div class="mb-2">
-      { post.text }
+      { @html post.html() }
     </div>
     <div class="flex">
       <div class="flex-1 flex">
@@ -26,14 +26,5 @@
       <!-- <i class="bx bx-edit text-2xl" /> -->
     </div>
   </div>
-  <ComposerModal open={isModalOpen} onClose={() => isModalOpen = false} posts={[post]} />
-</div>
-
-<script lang="ts">
-  import ComposerModal from "./ComposerModal.svelte";
-  let isModalOpen: boolean = false;
-</script>
-
-<div>
   <ComposerModal open={isModalOpen} onClose={() => isModalOpen = false} posts={[post]} />
 </div>

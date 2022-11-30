@@ -26,6 +26,10 @@ export class ApiService {
     return await this.execute("post", "/posts", JSON.stringify(posts))
   }
 
+  async updatePosts(posts: Post[]) {
+    return await this.execute("put", `/posts`, JSON.stringify(posts), true)
+  }
+
   async fetchCategories(): Promise<Category[]> {
     return await this.execute("get", "/categories")
   }
@@ -37,7 +41,7 @@ export class ApiService {
     }))
   }
 
-  async execute(method: string, path: string, body?: string) {
+  async execute(method: string, path: string, body?: string, ignoreResponseBody?: boolean) {
     let req: Request = {
       method,
       headers: {
@@ -49,6 +53,8 @@ export class ApiService {
       req.body = body
     }
     let res = await fetch(`${this._base}${path}`, req)
-    return await res.json()
+    if(!ignoreResponseBody) {
+      return await res.json()
+    }
   }
 }

@@ -11,6 +11,10 @@ export class Post{
     this.key = key
   }
 
+  html() {
+    return this.text?.replace(/(?:\r\n|\r|\n)/g, '<br>')
+  }
+
   static getHtml(tweet: Post) {
     return tweet.text?.replace(/(?:\r\n|\r|\n)/g, '<br>')
   }

@@ -17,6 +17,7 @@ func main() {
 	router := lib.NetlifyRouter{
 		Get:  Get,
 		Post: Post,
+		Put:  Put,
 	}
 	lambda.Start(router.Handler)
 }
@@ -89,5 +90,40 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 			return utils.ErrorResponse(err, "(Post) utils.ConvertToJsonString")
 		}
 		return utils.OkResponse(&jstr)
+	}
+}
+
+func Put(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
+	var posts []lib.Post
+	err := json.Unmarshal([]byte(request.Body), &posts)
+	if err != nil {
+		return utils.ErrorResponse(err, "json.Unmarshal")
+	}
+
+	userId := claims["user_id"].(string)
+	serviceId := claims["service_id"].(string)
+	serviceIdNum, err := strconv.Atoi(serviceId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Post) cast service id to num")
+	}
+	userIdNum, err := strconv.Atoi(userId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Post) cast user id to num")
+	}
+
+	if len(posts) == 1 {
+		err = lib.UpdatePostInDb(userIdNum, serviceIdNum, posts[0])
+		if err != nil {
+			return utils.ErrorResponse(err, "(Post) save post to db")
+		}
+
+		return utils.OkResponse(nil)
+	} else {
+		err = lib.UpdateThreadInDb(userIdNum, serviceIdNum, posts)
+		if err != nil {
+			return utils.ErrorResponse(err, "(Post) save thread to db")
+		}
+
+		return utils.OkResponse(nil)
 	}
 }

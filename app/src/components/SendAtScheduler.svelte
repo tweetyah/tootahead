@@ -21,14 +21,14 @@
       d.push(addDays(new Date(), i))
     }
     dates = d
-
-    setDate(new Date())
   })
 
   function setDate(date: Date) {
+    console.log('setDate', date)
     let dateStr = `${date.getFullYear()}-`
-    dateStr += date.getMonth() < 10 ? `0${date.getMonth()}-` : `${date.getMonth()}-`
+    dateStr += date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}-` : `${date.getMonth() + 1}-`
     dateStr += date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`
+    console.log('dateStr', dateStr)
     let timeStr = date.getHours() < 10 ? `0${date.getHours()}:` : `${date.getHours()}:`
     timeStr += date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`
     value = date
