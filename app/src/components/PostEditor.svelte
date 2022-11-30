@@ -12,8 +12,10 @@
   import { cubicInOut } from "svelte/easing"
   import { addMinutes } from 'date-fns'
   import { onDestroy, onMount } from "svelte";
+  import Modal from "./Modal.svelte";
 
   let isMobileDrawerOpen = false
+  let isDeleteModalOpen = false
 
   export let sendAt: Date
   $: if(sendAt) calcIsSaveDisabled()
@@ -47,6 +49,7 @@
   }
 
   async function deletePosts() {
+    isDeleteModalOpen = false
     await $api.deletePosts(posts)
     reset()
     alert.set({
@@ -126,7 +129,7 @@
           disabled={isSaveDisabled}
         />
         <Button
-          onClick={() => deletePosts()}
+          onClick={() => isDeleteModalOpen = true}
           icon="bxs-trash"
           title="Delete"
         />
@@ -177,4 +180,12 @@
       </div>
     </div>
   {/if}
+
+  <Modal title="Confirm" open={isDeleteModalOpen} onClose={() => isDeleteModalOpen = false}>
+    This post will be permanently deleted. This action cannot be undone. Confirm?
+    <div class="flex gap-2">
+      <Button onClick={() => isDeleteModalOpen = false} title="Cancel" />
+      <Button onClick={() => deletePosts()} title="Delete" />
+    </div>
+  </Modal>
 </div>

@@ -21,9 +21,12 @@ export class ApiService {
       path += `?filter=${filter}`
     }
     const res = await this.execute("get", path)
-    let posts: Post[] = []
-    res.forEach((r: any) => posts.push(Post.fromDb(r)))
-    return posts
+    if (res) {
+      let posts: Post[] = []
+      res.forEach((r: any) => posts.push(Post.fromDb(r)))
+      return posts
+    }
+    return null
   }
 
   async fetchScheduledPosts(): Promise<Post[]> {

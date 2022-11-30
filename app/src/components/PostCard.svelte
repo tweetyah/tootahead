@@ -4,6 +4,7 @@
 
   export let post: Post;
   export let editable: boolean = false
+  export let onUpdated: Function
   let isModalOpen: boolean = false;
 
   function openModal() {
@@ -11,12 +12,18 @@
       isModalOpen = true
     }
   }
+
+  function onPostUpdated() {
+    if(onUpdated) {
+      onUpdated()
+    }
+  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div>
   <div on:click={() => openModal()}
-    class="my-2 p-2 bg-white border-border border rounded-sm shadow-sm flex flex-col {editable ? "hover:bg-gray-100 hover:cursor-pointer" : null}">
+    class="p-2 bg-white border-border border rounded-sm shadow-sm flex flex-col {editable ? "hover:bg-gray-100 hover:cursor-pointer" : null}">
     <div class="mb-2">
       { @html post.html() }
     </div>
@@ -34,5 +41,9 @@
       <!-- <i class="bx bx-edit text-2xl" /> -->
     </div>
   </div>
-  <ComposerModal open={isModalOpen} onClose={() => isModalOpen = false} posts={[post]} />
+  <ComposerModal
+    open={isModalOpen}
+    onClose={() => isModalOpen = false}
+    onUpdated={() => onPostUpdated()}
+    posts={[post]} />
 </div>
