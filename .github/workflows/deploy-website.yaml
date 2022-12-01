@@ -7,16 +7,13 @@ on:
     paths:
       - website/**.*
 
-
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    name: 'Deploy to Netlify'
     steps:
-     - uses: actions/checkout@v1
-     - run: |
-        echo "hello world!"
-    #     pip install -r requirements.txt
-    #     echo "Another message or command"
-    #     python myscript.py
-    #     bash some-shell-script-file.sh -xe
-    #  - run: echo "One last message"
+      - uses: jsmrcaga/action-netlify-deploy@v1.1.0
+        with:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.WEBSITE_SITE_ID }}
+          NETLIFY_DEPLOY_TO_PROD: true
