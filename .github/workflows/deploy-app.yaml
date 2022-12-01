@@ -10,9 +10,16 @@ on:
 
 jobs:
   deploy:
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - uses: actions/github-script@v6
+    #     with:
+    #       script: |
+    #         curl -X POST -d {} ${{ secrets.APP_DEPLOY_HOOK }}
+
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            curl -X POST -d {} ${{ secrets.APP_DEPLOY_HOOK }}
+    - name: curl
+      uses: wei/curl@v1
+      with:
+        args: -X POST -d {} ${{ secrets.APP_DEPLOY_HOOK }}
