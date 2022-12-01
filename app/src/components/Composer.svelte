@@ -26,7 +26,6 @@
   onMount(() => {
     sendAt = addMinutes(new Date(), 15)
     timeout = setTimeout(() => {
-      console.log("timeout hit")
       calcIsSaveDisabled()
     }, 30000)
   })

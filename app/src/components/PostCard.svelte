@@ -4,7 +4,7 @@
 
   export let post: Post;
   export let editable: boolean = false
-  export let onUpdated: Function
+  export let onUpdated: Function = undefined
   let isModalOpen: boolean = false;
 
   function openModal() {

@@ -24,11 +24,9 @@
   })
 
   function setDate(date: Date) {
-    console.log('setDate', date)
     let dateStr = `${date.getFullYear()}-`
     dateStr += date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}-` : `${date.getMonth() + 1}-`
     dateStr += date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`
-    console.log('dateStr', dateStr)
     let timeStr = date.getHours() < 10 ? `0${date.getHours()}:` : `${date.getHours()}:`
     timeStr += date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`
     value = date
@@ -74,7 +72,6 @@
     onDateInputChangedTimer = setTimeout(() => {
       let spl = e.target.value.split("-")
       let d = new Date(spl[0], spl[1], spl[2], 0, 0, 0)
-      console.log(d)
       setSelectedDate(d);
     }, 300);
   }
@@ -93,7 +90,6 @@
         0,
         0
       )
-      console.log(e.target.value)
       setDate(newDate);
     }, 300);
   }

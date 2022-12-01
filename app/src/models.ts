@@ -1,3 +1,10 @@
+export enum ViewState {
+  None,
+  Done,
+  Loading,
+  NoData
+}
+
 export class Post{
   id?: number
   text?: string
@@ -26,10 +33,8 @@ export class Post{
     tweet.parentId = row.tweet_parent
     tweet.threadCount = row.thread_count
     // TODO: Convert UTC to local time here
-    console.log(row)
     if(row.sendAt) tweet.sendAt = new Date(row.sendAt)
     if(row.resendAt) tweet.resendAt = new Date(row.resendAt)
-    console.log(tweet)
     return tweet
   }
 }

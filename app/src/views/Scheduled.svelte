@@ -1,23 +1,24 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { text } from 'svelte/internal';
+  import Loading from '../components/Loading.svelte';
   import PostCard from '../components/PostCard.svelte';
   import View from '../components/View.svelte';
-  import type { Post } from '../models'
+  import { ViewState, type Post } from '../models'
   import { api } from '../store';
 
   let postmap: {[key: string]: Post[]} = {};
-  let isNoContent: boolean
+  let state: ViewState = ViewState.None
 
   onMount(async () => {
     await load()
   })
 
   async function load() {
+    state = ViewState.Loading
     let pm: {[key: string]: Post[]} = {};
 
     let posts = await $api.fetchPosts("scheduled")
-    console.log('posts', posts)
     if(posts && posts.length > 0) {
       posts.sort((a, b) => a.sendAt && b.sendAt ? a.sendAt.getTime() - b.sendAt.getTime() : 0)
       posts.forEach(p => {
@@ -25,27 +26,31 @@
         if(!pm[dateStr]) pm[dateStr] = []
         pm[dateStr].push(p)
       })
+      state = ViewState.Done
     } else {
-      isNoContent = true
+      state = ViewState.NoData
     }
     postmap = pm
   }
 
   async function onPostUpdated() {
-    console.log('onpostupdated')
     await load()
   }
 
 </script>
 
 <View title="Scheduled posts">
-  {#if isNoContent}
-    <div>
-      You have no scheduled posts...
+  {#if state == ViewState.NoData}
+    <div class="text-gray-600 italic">
+      You have no scheduled posts.
     </div>
   {/if}
-  <div>
-    {#each Object.keys(postmap) as date}
+  {#if state == ViewState.Loading}
+    <Loading />
+  {/if}
+  {#if state == ViewState.Done}
+    <div>
+      {#each Object.keys(postmap) as date}
       <div>
         <h2>{ date }</h2>
         <div class="grid gap-2 grid-cols-1 lg:grid-cols-3">
@@ -54,6 +59,7 @@
           {/each}
         </div>
       </div>
-    {/each}
-  </div>
+      {/each}
+    </div>
+  {/if}
 </View>
