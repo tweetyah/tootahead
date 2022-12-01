@@ -45,16 +45,22 @@
     <Loading />
   {/if}
   {#if state == ViewState.Done}
-    <div>
+    <div class="grid grid-cols-[min-content_1fr] items-center justify-center">
       {#each Object.keys(postmap) as date}
-      <div>
+        <div class="rounded-full border-mastodon border-2 text-white bg-mastodon grid items-center justify-center w-[30px] h-[30px] mx-2">
+          <i class="bx bx-calendar" />
+        </div>
         <h2>{ date }</h2>
-        <div class="grid gap-2 grid-cols-1 lg:grid-cols-3">
+        <div class="grid items-center justify-center h-full">
+           <div class="bg-mastodon w-[2px] h-full">
+
+           </div>
+        </div>
+        <div class="grid gap-2 grid-cols-1 lg:grid-cols-3 mb-4">
           {#each postmap[date] as post}
             <PostCard post={post}/>
           {/each}
         </div>
-      </div>
       {/each}
     </div>
   {/if}

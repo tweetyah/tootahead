@@ -3,6 +3,7 @@
   import { TIME_RANGE } from '../constants'
   import type { TimeRange } from "../models";
   import { onMount } from "svelte";
+  import { set_data } from "svelte/internal";
 
   export let value: Date
   let _date: string
@@ -21,6 +22,8 @@
       d.push(addDays(new Date(), i))
     }
     dates = d
+
+    setDate(value)
   })
 
   function setDate(date: Date) {
@@ -96,17 +99,22 @@
 </script>
 
 <div class="mb-2 p-2">
-  <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
-    <input class="focus:outline-0" type="date" bind:value={_date} on:change={onDateInputChanged} />
-    <input class="focus:outline-0" type="time" bind:value={_time} on:change={onTimeInputChanged}/>
+  <h3>Send at</h3>
+  <div class="flex flex-col gap-2 mb-2">
+    <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
+      <input class="focus:outline-0 w-full" type="date" bind:value={_date} on:change={onDateInputChanged} />
+    </div>
+    <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
+      <input class="focus:outline-0 w-full" type="time" bind:value={_time} on:change={onTimeInputChanged}/>
+    </div>
   </div>
-  <h3>Date</h3>
+  <h3>Quick date</h3>
   <div class="grid grid-cols-2 gap-2 mb-2">
     {#each dates as d}
       <Button variant="outlined" title={d.toLocaleDateString()} onClick={() => setSelectedDate(d)} />
     {/each}
   </div>
-  <h3>Time</h3>
+  <h3>Quick time</h3>
   <div class="grid grid-cols-2 gap-2">
     <Button variant="outlined" title="Night (12-6am)" onClick={() => setTimeRange(TIME_RANGE.NIGHT)} />
     <Button variant="outlined" title="Morning" onClick={() => setTimeRange(TIME_RANGE.MORNING)} />
