@@ -10,6 +10,7 @@
 
   export let closeButton: boolean
   export let onClose: Function | undefined
+  export let onNavigate: Function | undefined
 
   let name: string
   let handle : string
@@ -55,9 +56,9 @@
   <hr class="border-dark2 my-2" />
   <div class="flex-1 marker:flex flex-col">
     <NavHeader>Posts</NavHeader>
-    <NavLink title="Home" icon="bx-home" to="/" />
-    <NavLink title="Scheduled" icon="bx-time" to="/scheduled" />
-    <NavLink title="Sent" icon="bx-check-double" to="/sent" />
+    <NavLink title="Home" icon="bx-home" to="/" onNavigate={onNavigate} />
+    <NavLink title="Scheduled" icon="bx-time" to="/scheduled" onNavigate={onNavigate} />
+    <NavLink title="Sent" icon="bx-check-double" to="/sent" onNavigate={onNavigate} />
   </div>
   {#if isLoggedIn}
     <div class="bg-dark2 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">
