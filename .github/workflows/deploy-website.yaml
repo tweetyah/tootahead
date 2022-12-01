@@ -1,0 +1,22 @@
+name: Deploy App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - website/**.*
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v1
+     - run: |
+        echo "hello world!"
+    #     pip install -r requirements.txt
+    #     echo "Another message or command"
+    #     python myscript.py
+    #     bash some-shell-script-file.sh -xe
+    #  - run: echo "One last message"
