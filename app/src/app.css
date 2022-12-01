@@ -5,12 +5,20 @@
 body {
   height: 100vh;
   width: 100vw;
+  @apply bg-bglight;
 }
 
 #app {
   height: 100%;
   width: 100%;
-  @apply bg-bglight;
+}
+
+h1 {
+  @apply text-3xl -scroll-mb-10 mb-2;
+}
+
+h2 {
+  @apply text-xl my-1;
 }
 
 .toggle-checkbox:checked {
@@ -18,6 +26,7 @@ body {
   right: 0;
   border-color: #68D391;
 }
+
 .toggle-checkbox:checked + .toggle-label {
   @apply: bg-green-400;
   background-color: #68D391;

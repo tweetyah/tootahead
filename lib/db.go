@@ -70,8 +70,6 @@ func SavePostToDb(userId int, serviceId int, post Post) (*Post, error) {
 	}
 	post.Id = &lastInserted
 
-	log.Println("returning", post)
-
 	return &post, nil
 }
 
@@ -134,6 +132,67 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 	}
 
 	return &threadStart, nil
+}
+
+func UpdatePostInDb(userId int, serviceId int, post Post) error {
+	db, err := GetDatabase()
+	if err != nil {
+		return errors.Wrap(err, "(UpdatePostInDb) GetDatabase")
+	}
+
+	query := "update posts set text = ?, send_at = ? where id_user = ? and id = ?"
+	_, err = db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), userId, post.Id)
+	if err != nil {
+		return errors.Wrap(err, "(UpdatePostInDb) db.Exec")
+	}
+
+	return nil
+}
+
+func UpdateThreadInDb(userId int, serviceId int, posts []Post) error {
+	db, err := GetDatabase()
+	if err != nil {
+		return errors.Wrap(err, "(UpdatePostInDb) GetDatabase")
+	}
+
+	// TODO: do this in a transaction
+	query := "update posts set text = ?, send_at = ? where id_user = ? and id = ?"
+	for _, post := range posts {
+		_, err = db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), userId, post.Id)
+		if err != nil {
+			return errors.Wrap(err, "(UpdatePostInDb) db.Exec")
+		}
+	}
+
+	return nil
+}
+
+func DeletePostsFromDb(userId int, serviceId int, posts []Post) error {
+	db, err := GetDatabase()
+	if err != nil {
+		return errors.Wrap(err, "(DeletePostsFromDb) GetDatabase")
+	}
+
+	var params []interface{}
+	params = append(params, userId)
+	query := "delete from posts where id_user = ? and id in ("
+	for idx, el := range posts {
+		params = append(params, *el.Id)
+		query += "?"
+		if idx != len(posts)-1 {
+			query += ","
+		}
+	}
+	query += ")"
+
+	log.Println(query, params)
+
+	_, err = db.Exec(query, params...)
+	if err != nil {
+		return errors.Wrap(err, "(DeletePostsFromDb) db.Exec")
+	}
+
+	return nil
 }
 
 func GetUserBySocialLogin(providerType int, providerId string) (*User, error) {

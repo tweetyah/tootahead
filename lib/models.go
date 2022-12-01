@@ -9,6 +9,7 @@ type Post struct {
 	SendAt      *time.Time `json:"sendAt"`
 	ResendAt    *time.Time `json:"resendAt"`
 	ThreadCount *int       `json:"threadCount"`
+	Status      *int       `json:"status"`
 }
 
 func (p *Post) GetSendAtSqlTimestamp() *string {

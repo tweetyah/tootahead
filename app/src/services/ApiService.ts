@@ -15,8 +15,22 @@ export class ApiService {
     this._token = token
   }
 
-  async fetchPosts(): Promise<Post[]> {
-    const res = await this.execute("get", "/posts")
+  async fetchPosts(filter?: string): Promise<Post[]> {
+    let path = "/posts"
+    if(filter) {
+      path += `?filter=${filter}`
+    }
+    const res = await this.execute("get", path)
+    if (res) {
+      let posts: Post[] = []
+      res.forEach((r: any) => posts.push(Post.fromDb(r)))
+      return posts
+    }
+    return null
+  }
+
+  async fetchScheduledPosts(): Promise<Post[]> {
+    const res = await this.execute("get", "/posts?filter=scheduled")
     let posts: Post[] = []
     res.forEach((r: any) => posts.push(Post.fromDb(r)))
     return posts
@@ -24,6 +38,14 @@ export class ApiService {
 
   async savePosts(posts: Post[]) {
     return await this.execute("post", "/posts", JSON.stringify(posts))
+  }
+
+  async updatePosts(posts: Post[]) {
+    return await this.execute("put", `/posts`, JSON.stringify(posts), true)
+  }
+
+  async deletePosts(posts: Post[]) {
+    return await this.execute("delete", `/posts`, JSON.stringify(posts), true)
   }
 
   async fetchCategories(): Promise<Category[]> {
@@ -37,7 +59,7 @@ export class ApiService {
     }))
   }
 
-  async execute(method: string, path: string, body?: string) {
+  async execute(method: string, path: string, body?: string, ignoreResponseBody?: boolean) {
     let req: Request = {
       method,
       headers: {
@@ -49,6 +71,11 @@ export class ApiService {
       req.body = body
     }
     let res = await fetch(`${this._base}${path}`, req)
-    return await res.json()
+    if(res.status < 200 || 299 < res.status ) {
+      throw new Error("(ApiService.execute) non-success status code", res)
+    }
+    if(!ignoreResponseBody) {
+      return await res.json()
+    }
   }
 }

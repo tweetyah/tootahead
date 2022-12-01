@@ -5,7 +5,6 @@
   let timeout
 
   function dismiss() {
-    console.log('dismiss')
     alert.set(undefined)
     timeout = undefined
   }
@@ -13,9 +12,7 @@
   alert.subscribe((val) => {
     if(val && !timeout) {
       timeout = 1
-      console.log(val)
       timeout = setTimeout(() => {
-        console.log('dismissing...')
         dismiss()
         timeout = undefined
       }, 5000)

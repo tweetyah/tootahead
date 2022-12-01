@@ -1,14 +1,25 @@
+export enum ViewState {
+  None,
+  Done,
+  Loading,
+  NoData
+}
+
 export class Post{
   id?: number
   text?: string
   parentId?: string
   key?: string
   sendAt?: Date
-  retweetAt?: Date
+  resendAt?: Date
   threadCount?: number
 
   constructor(key?: string) {
     this.key = key
+  }
+
+  html() {
+    return this.text?.replace(/(?:\r\n|\r|\n)/g, '<br>')
   }
 
   static getHtml(tweet: Post) {
@@ -22,8 +33,8 @@ export class Post{
     tweet.parentId = row.tweet_parent
     tweet.threadCount = row.thread_count
     // TODO: Convert UTC to local time here
-    if(row.send_at) tweet.sendAt = new Date(row.send_at)
-    if(row.retweet_at) tweet.retweetAt = new Date(row.retweet_at)
+    if(row.sendAt) tweet.sendAt = new Date(row.sendAt)
+    if(row.resendAt) tweet.resendAt = new Date(row.resendAt)
     return tweet
   }
 }

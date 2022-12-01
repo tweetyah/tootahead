@@ -3,7 +3,7 @@
   import { navigateTo } from "svelte-router-spa";
   import { Service } from "../models";
   import { ApiService } from "../services/ApiService";
-  import { api, init, service, setAuth } from '../store'
+  import { init, service } from '../store'
 
   onMount(async () => {
     let query = location.search

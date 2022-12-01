@@ -3,6 +3,8 @@ import HomeView from "./views/Home.svelte"
 import LibraryView from "./views/Library.svelte"
 import AuthView from "./views/Auth.svelte"
 import Login from './views/Login.svelte'
+import Scheduled from './views/Scheduled.svelte'
+import Sent from './views/Sent.svelte'
 
 function userIsAdmin() {
   //check if user is admin and returns true or false
@@ -17,6 +19,16 @@ const routes = [
   {
     name: '/library',
     component: LibraryView,
+    layout: Layout
+  },
+  {
+    name: '/scheduled',
+    component: Scheduled,
+    layout: Layout
+  },
+  {
+    name: '/sent',
+    component: Sent,
     layout: Layout
   },
   {

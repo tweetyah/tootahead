@@ -36,10 +36,3 @@ export async function init() {
     custom_emoji.set(json)
   }
 }
-
-export function setAuth(value: any) {
-  auth.set(value)
-  name.set(value.name)
-  handle.set(value.username)
-  profileImgUrl.set(value.profile_image_url)
-}

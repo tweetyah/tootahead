@@ -24,6 +24,7 @@ module.exports = {
       dark2: '#282C37',
       dark3: '#313643',
       bglight: '#EFF3F5',
+      border: "#c0cdd9"
     },
   },
   plugins: [

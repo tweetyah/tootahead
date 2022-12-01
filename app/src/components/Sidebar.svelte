@@ -1,6 +1,7 @@
 <script lang="ts">
   import { alert, auth, service } from '../store'
   import NavLink from "./NavLink.svelte";
+  import NavHeader from './NavHeader.svelte';
   import Button from './Button.svelte';
   import { navigateTo } from 'svelte-router-spa';
   import { Service } from '../models';
@@ -53,7 +54,10 @@
   </div>
   <hr class="border-dark2 my-2" />
   <div class="flex-1 marker:flex flex-col">
+    <NavHeader>Posts</NavHeader>
     <NavLink title="Home" icon="bx-home" to="/" />
+    <NavLink title="Scheduled" icon="bx-time" to="/scheduled" />
+    <NavLink title="Sent" icon="bx-check-double" to="/sent" />
   </div>
   {#if isLoggedIn}
     <div class="bg-dark2 flex rounded shadow-sm hover:shadow-md p-1 text-slate-50">

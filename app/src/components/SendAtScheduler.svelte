@@ -3,6 +3,7 @@
   import { TIME_RANGE } from '../constants'
   import type { TimeRange } from "../models";
   import { onMount } from "svelte";
+  import { set_data } from "svelte/internal";
 
   export let value: Date
   let _date: string
@@ -22,12 +23,12 @@
     }
     dates = d
 
-    setDate(new Date())
+    setDate(value)
   })
 
   function setDate(date: Date) {
     let dateStr = `${date.getFullYear()}-`
-    dateStr += date.getMonth() < 10 ? `0${date.getMonth()}-` : `${date.getMonth()}-`
+    dateStr += date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}-` : `${date.getMonth() + 1}-`
     dateStr += date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`
     let timeStr = date.getHours() < 10 ? `0${date.getHours()}:` : `${date.getHours()}:`
     timeStr += date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`
@@ -74,7 +75,6 @@
     onDateInputChangedTimer = setTimeout(() => {
       let spl = e.target.value.split("-")
       let d = new Date(spl[0], spl[1], spl[2], 0, 0, 0)
-      console.log(d)
       setSelectedDate(d);
     }, 300);
   }
@@ -93,24 +93,28 @@
         0,
         0
       )
-      console.log(e.target.value)
       setDate(newDate);
     }, 300);
   }
 </script>
 
 <div class="mb-2 p-2">
-  <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
-    <input class="focus:outline-0" type="date" bind:value={_date} on:change={onDateInputChanged} />
-    <input class="focus:outline-0" type="time" bind:value={_time} on:change={onTimeInputChanged}/>
+  <h3>Send at</h3>
+  <div class="flex flex-col gap-2 mb-2">
+    <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
+      <input class="focus:outline-0 w-full" type="date" bind:value={_date} on:change={onDateInputChanged} />
+    </div>
+    <div class="border-[1px] border-mastodon rounded p-1 flex gap-4">
+      <input class="focus:outline-0 w-full" type="time" bind:value={_time} on:change={onTimeInputChanged}/>
+    </div>
   </div>
-  <h3>Date</h3>
+  <h3>Quick date</h3>
   <div class="grid grid-cols-2 gap-2 mb-2">
     {#each dates as d}
       <Button variant="outlined" title={d.toLocaleDateString()} onClick={() => setSelectedDate(d)} />
     {/each}
   </div>
-  <h3>Time</h3>
+  <h3>Quick time</h3>
   <div class="grid grid-cols-2 gap-2">
     <Button variant="outlined" title="Night (12-6am)" onClick={() => setTimeRange(TIME_RANGE.NIGHT)} />
     <Button variant="outlined" title="Morning" onClick={() => setTimeRange(TIME_RANGE.MORNING)} />

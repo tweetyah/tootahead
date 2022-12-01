@@ -11,21 +11,77 @@ import (
 	utils "github.com/bmorrisondev/go-utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/tweetyah/lib"
+	"github.com/tweetyah/lib/constants"
 )
 
 func main() {
 	router := lib.NetlifyRouter{
-		Get:  Get,
-		Post: Post,
+		Get:    Get,
+		Post:   Post,
+		Put:    Put,
+		Delete: Delete,
 	}
 	lambda.Start(router.Handler)
 }
 
 func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		StatusCode: 200,
-		Body:       "hello world!",
-	}, nil
+	var posts []lib.Post
+
+	filter := request.QueryStringParameters["filter"]
+
+	if filter == "scheduled" {
+		query := "select id, text, send_at, status from posts where id_user = ? and status = ?"
+		res, err := db.Query(query, claims["user_id"], constants.PostStatus_Scheduled)
+		if err != nil {
+			return utils.ErrorResponse(err, "query db")
+		}
+
+		for res.Next() {
+			var p lib.Post
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			if err != nil {
+				return utils.ErrorResponse(err, "scan")
+			}
+			posts = append(posts, p)
+		}
+	} else if filter == "sent" {
+		query := "select id, text, send_at, status from posts where id_user = ? and status = ?"
+		res, err := db.Query(query, claims["user_id"], constants.PostStatus_Sent)
+		if err != nil {
+			return utils.ErrorResponse(err, "query db")
+		}
+
+		for res.Next() {
+			var p lib.Post
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			if err != nil {
+				return utils.ErrorResponse(err, "scan")
+			}
+			posts = append(posts, p)
+		}
+	} else {
+		query := "select id, text, send_at, status from posts where id_user = ?"
+		res, err := db.Query(query, claims["user_id"])
+		if err != nil {
+			return utils.ErrorResponse(err, "query db")
+		}
+
+		for res.Next() {
+			var p lib.Post
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			if err != nil {
+				return utils.ErrorResponse(err, "scan")
+			}
+			posts = append(posts, p)
+		}
+	}
+
+	jstr, err := utils.ConvertToJsonString(posts)
+	if err != nil {
+		return utils.ErrorResponse(err, "conver to json string")
+	}
+
+	return utils.OkResponse(&jstr)
 }
 
 func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
@@ -71,4 +127,65 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 		}
 		return utils.OkResponse(&jstr)
 	}
+}
+
+func Put(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
+	var posts []lib.Post
+	err := json.Unmarshal([]byte(request.Body), &posts)
+	if err != nil {
+		return utils.ErrorResponse(err, "json.Unmarshal")
+	}
+
+	userId := claims["user_id"].(string)
+	serviceId := claims["service_id"].(string)
+	serviceIdNum, err := strconv.Atoi(serviceId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Put) cast service id to num")
+	}
+	userIdNum, err := strconv.Atoi(userId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Put) cast user id to num")
+	}
+
+	if len(posts) == 1 {
+		err = lib.UpdatePostInDb(userIdNum, serviceIdNum, posts[0])
+		if err != nil {
+			return utils.ErrorResponse(err, "(Put) save post to db")
+		}
+
+		return utils.OkResponse(nil)
+	} else {
+		err = lib.UpdateThreadInDb(userIdNum, serviceIdNum, posts)
+		if err != nil {
+			return utils.ErrorResponse(err, "(Put) save thread to db")
+		}
+
+		return utils.OkResponse(nil)
+	}
+}
+
+func Delete(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB) (events.APIGatewayProxyResponse, error) {
+	var posts []lib.Post
+	err := json.Unmarshal([]byte(request.Body), &posts)
+	if err != nil {
+		return utils.ErrorResponse(err, "json.Unmarshal")
+	}
+
+	userId := claims["user_id"].(string)
+	serviceId := claims["service_id"].(string)
+	serviceIdNum, err := strconv.Atoi(serviceId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Delete) cast service id to num")
+	}
+	userIdNum, err := strconv.Atoi(userId)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Delete) cast user id to num")
+	}
+
+	err = lib.DeletePostsFromDb(userIdNum, serviceIdNum, posts)
+	if err != nil {
+		return utils.ErrorResponse(err, "(Delete) save thread to db")
+	}
+
+	return utils.OkResponse(nil)
 }

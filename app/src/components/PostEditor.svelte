@@ -12,19 +12,18 @@
   import { cubicInOut } from "svelte/easing"
   import { addMinutes } from 'date-fns'
   import { onDestroy, onMount } from "svelte";
+  import Modal from "./Modal.svelte";
+
+  let isMobileDrawerOpen = false
+  let isDeleteModalOpen = false
+
+  export let sendAt: Date
+  $: if(sendAt) calcIsSaveDisabled()
+  export let posts: Post[]
+  export let onUpdated: Function
 
   let timeout
-  let isMobileDrawerOpen = false
-  let sendAt: Date = new Date()
-  $: if(sendAt) calcIsSaveDisabled()
-  let retweetAt: Date
-  let shouldRetweet: boolean
-  let posts: Post[] = [{
-    text: ""
-  }]
-
   onMount(() => {
-    sendAt = addMinutes(new Date(), 15)
     timeout = setTimeout(() => {
       calcIsSaveDisabled()
     }, 30000)
@@ -34,27 +33,32 @@
     timeout = undefined
   })
 
-  function addTweet() {
-    posts = [...posts, {
-      text: ""
-    }]
-  }
-
-  async function saveTweets() {
-    // TODO: app or comp state
-    posts.forEach(t => {
-      t.sendAt = sendAt
-      if(shouldRetweet) {
-        t.retweetAt = retweetAt
-      }
+  async function update() {
+    posts.forEach(p => {
+      p.sendAt = sendAt
     })
-    await $api.savePosts(posts)
+    await $api.updatePosts(posts)
     reset()
     alert.set({
-      title: "Post saved",
-      body: "You're post was scheduled successfully!"
+      title: "Post updated",
+      body: "You're post was updated successfully!"
     })
-    isMobileDrawerOpen = false
+    if (onUpdated) {
+      onUpdated()
+    }
+  }
+
+  async function deletePosts() {
+    isDeleteModalOpen = false
+    await $api.deletePosts(posts)
+    reset()
+    alert.set({
+      title: "Post deleted",
+      body: "You're post was deleted successfully!"
+    })
+    if (onUpdated) {
+      onUpdated()
+    }
   }
 
   function reset() {
@@ -100,7 +104,6 @@
           <ComposerCard bind:post={p} index={idx} total={posts.length} onUpdate={() => calculateValidation()} />
         {/each}
       </div>
-      <!-- <Button onClick={() => addTweet()} icon="bx-list-plus" title={textvars[$service]["add-post"]} /> -->
     </div>
     <div id="composer-settings" class="invisible w-0 sm:visible sm:w-auto">
       <div class="mb-2">
@@ -116,25 +119,19 @@
               <SendAtScheduler bind:value={sendAt} />
             </div>
           </AccordionNode>
-          <!-- <AccordionNode title="Retweet at" subtitle={shouldRetweet ? `${retweetAt.toLocaleDateString()} ${retweetAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Off'}>
-            <div class="px-3">
-              <RetweetAtScheduler bind:value={retweetAt} bind:isEnabled={shouldRetweet} />
-            </div>
-          </AccordionNode> -->
-          <!-- <AccordionNode title="Categories">
-            Categories
-          </AccordionNode>
-          <AccordionNode title="Other">
-            Save to library opt
-          </AccordionNode> -->
         </Accordion>
       </div>
-      <div class="flex">
+      <div class="flex gap-2">
         <Button
-          onClick={() => saveTweets()}
+          onClick={() => update()}
           icon="bxs-save"
-          title="Save"
+          title="Update"
           disabled={isSaveDisabled}
+        />
+        <Button
+          onClick={() => isDeleteModalOpen = true}
+          icon="bxs-trash"
+          title="Delete"
         />
       </div>
     </div>
@@ -176,22 +173,19 @@
               <SendAtScheduler bind:value={sendAt} />
             </div>
           </AccordionNode>
-          <!-- <AccordionNode title="Retweet at" subtitle={shouldRetweet ? `${retweetAt.toLocaleDateString()} ${retweetAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : 'Off'}>
-            <div class="px-3">
-              <RetweetAtScheduler bind:value={retweetAt} bind:isEnabled={shouldRetweet} />
-            </div>
-          </AccordionNode> -->
-          <!-- <AccordionNode title="Categories">
-            Categories
-          </AccordionNode>
-          <AccordionNode title="Other">
-            Save to library opt
-          </AccordionNode> -->
         </Accordion>
         <div class="grid m-2">
-          <Button onClick={() => saveTweets()} icon="bxs-save" title="Save" disabled={isSaveDisabled}/>
+          <Button onClick={() => update()} icon="bxs-save" title="Update" disabled={isSaveDisabled}/>
         </div>
       </div>
     </div>
   {/if}
+
+  <Modal title="Confirm" open={isDeleteModalOpen} onClose={() => isDeleteModalOpen = false}>
+    This post will be permanently deleted. This action cannot be undone. Confirm?
+    <div class="flex gap-2">
+      <Button onClick={() => isDeleteModalOpen = false} title="Cancel" />
+      <Button onClick={() => deletePosts()} title="Delete" />
+    </div>
+  </Modal>
 </div>
