@@ -24,6 +24,7 @@
 
   let timeout
   onMount(() => {
+    calcIsMobileDrawerDisabled()
     timeout = setTimeout(() => {
       calcIsSaveDisabled()
     }, 30000)
