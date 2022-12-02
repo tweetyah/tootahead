@@ -36,14 +36,13 @@
     uploadMedia(files[0])
   }
 
-  let images = [];
-
   async function uploadMedia(file) {
-    images = [...images, { isLoading: true }]
+    if(!post.media) post.media = []
+    post.media = [...post.media, { is_loading: true }]
     let encoded = await getBase64(file)
     let res = await $api.uploadMedia(encoded)
-    images = [...images.filter(i => i.isLoading !== true), res]
-    console.log('images', images)
+    post.media = [...post.media.filter(i => i.is_loading !== true), res]
+    console.log('images', post.media)
   }
 
   async function getBase64(file) {
@@ -98,13 +97,13 @@
       </div>
     </div>
 
-    {#if images}
+    {#if post.media}
       <div class="flex gap-2 mt-2">
-        {#each images as image}
+        {#each post.media as image}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div on:click={() => openLightbox(image.preview_url)}
             class="bg-gray-50/80 h-[100px] w-[100px] rounded hover:cursor-pointer hover:border hover:border-mastodon hover:shadow-lg flex items-center justify-center p-1">
-            {#if image.isLoading}
+            {#if image.is_loading}
               <Loading />
             {:else}
                 <img

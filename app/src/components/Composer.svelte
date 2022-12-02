@@ -44,9 +44,6 @@
     // TODO: app or comp state
     posts.forEach(t => {
       t.sendAt = sendAt
-      if(shouldRetweet) {
-        t.retweetAt = retweetAt
-      }
     })
     await $api.savePosts(posts)
     reset()

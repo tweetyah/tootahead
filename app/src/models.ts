@@ -13,6 +13,7 @@ export class Post{
   sendAt?: Date
   resendAt?: Date
   threadCount?: number
+  media?: Media[]
 
   constructor(key?: string) {
     this.key = key
@@ -32,11 +33,18 @@ export class Post{
     tweet.text = row.text
     tweet.parentId = row.tweet_parent
     tweet.threadCount = row.thread_count
+    tweet.media = row.media
     // TODO: Convert UTC to local time here
     if(row.sendAt) tweet.sendAt = new Date(row.sendAt)
     if(row.resendAt) tweet.resendAt = new Date(row.resendAt)
     return tweet
   }
+}
+
+export type Media = {
+  id?: string
+  preview_url?: string
+  is_loading?: boolean
 }
 
 export type Auth = {

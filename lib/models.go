@@ -1,6 +1,11 @@
 package lib
 
-import "time"
+import (
+	"log"
+	"time"
+
+	"github.com/bmorrisondev/go-utils"
+)
 
 type Post struct {
 	Id          *int64     `json:"id"`
@@ -10,6 +15,7 @@ type Post struct {
 	ResendAt    *time.Time `json:"resendAt"`
 	ThreadCount *int       `json:"threadCount"`
 	Status      *int       `json:"status"`
+	Media       []Media    `json:"media"`
 }
 
 func (p *Post) GetSendAtSqlTimestamp() *string {
@@ -26,6 +32,22 @@ func (p *Post) GetResendAtSqlTimestamp() *string {
 		return &returnValue
 	}
 	return nil
+}
+
+func (p *Post) MediaJson() *string {
+	if p.Media != nil {
+		jstr, err := utils.ConvertToJsonString(p.Media)
+		if err != nil {
+			log.Printf("error while converting media to json: %v", err)
+		}
+		return &jstr
+	}
+	return nil
+}
+
+type Media struct {
+	Id         *string `json:"id"`
+	PreviewUrl *string `json:"preview_url"`
 }
 
 type User struct {

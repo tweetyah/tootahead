@@ -36,9 +36,9 @@ func SaveTwitterAccessToken(userId int64, accessToken string, tokenExpiration ti
 func SaveMastodonAccessToken(userId int64, accessToken string, domain string) error {
 	query := `insert into user_tokens
 		(user_id, access_token, mastodon_domain)
-		values (?, ?, ?)
+			values (?, ?, ?)
 		on duplicate key update
-		access_token = ?, mastodon_domain = ?`
+			access_token = ?, mastodon_domain = ?`
 
 	db, err := GetDatabase()
 	if err != nil {
@@ -58,8 +58,8 @@ func SavePostToDb(userId int, serviceId int, post Post) (*Post, error) {
 		return nil, errors.Wrap(err, "(SavePostToDb) GetDatabase")
 	}
 
-	query := "insert into posts (text, send_at, retweet_at, id_user, service) values (?, ?, ?, ?, ?)"
-	results, err := db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.GetResendAtSqlTimestamp(), userId, serviceId)
+	query := "insert into posts (text, send_at, retweet_at, id_user, service, linked_media) values (?, ?, ?, ?, ?, ?)"
+	results, err := db.Exec(query, post.Text, post.GetSendAtSqlTimestamp(), post.GetResendAtSqlTimestamp(), userId, serviceId, post.MediaJson())
 	if err != nil {
 		return nil, errors.Wrap(err, "(SavePostToDb) db.Exec")
 	}
@@ -82,8 +82,8 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 	threadOrder := 1
 	threadCount := len(posts)
 	query := `insert into posts
-		(text, is_thread, thread_order, thread_count, send_at, retweet_at, id_user, service)
-		values (?, true, ?, ?, ?, ?, ?, ?)`
+		(text, is_thread, thread_order, thread_count, send_at, retweet_at, id_user, service, linked_media)
+		values (?, true, ?, ?, ?, ?, ?, ?, ?)`
 	threadStart := posts[0]
 	results, err := db.Exec(query,
 		threadStart.Text,
@@ -93,6 +93,7 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 		threadStart.GetResendAtSqlTimestamp(),
 		userId,
 		serviceId,
+		threadStart.MediaJson(),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "(SaveThreadToDb) db.Exec threadstart")
@@ -107,8 +108,8 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 
 	var params []interface{}
 	query = `insert into posts
-		(text, is_thread, thread_order, thread_parent, send_at, retweet_at, id_user, service)
-		values (?, true, ?, ?, ?, ?, ?, ?)`
+		(text, is_thread, thread_order, thread_parent, send_at, retweet_at, id_user, service, linked_media)
+		values (?, true, ?, ?, ?, ?, ?, ?, ?)`
 	for idx, el := range posts {
 		// Skip the first tweet since it was inserted earlier
 		if idx == 0 {
@@ -116,7 +117,7 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 		}
 		threadOrder++
 		if idx > 1 {
-			query += ",(?, true, ?, ?, ?, ?, ?, ?)"
+			query += ",(?, true, ?, ?, ?, ?, ?, ?, ?)"
 		}
 		params = append(params, el.Text)
 		params = append(params, threadOrder)
@@ -125,6 +126,7 @@ func SaveThreadToDb(userId int, serviceId int, posts []Post) (*Post, error) {
 		params = append(params, el.GetResendAtSqlTimestamp())
 		params = append(params, userId)
 		params = append(params, serviceId)
+		params = append(params, el.MediaJson())
 	}
 	_, err = db.Exec(query, params...)
 	if err != nil {

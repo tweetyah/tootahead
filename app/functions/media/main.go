@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -36,6 +37,8 @@ func Post(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.D
 	if err != nil {
 		return utils.ErrorResponse(err, "(Post) get instance and token by user")
 	}
+
+	log.Println(*token)
 
 	res, err := lib.UploadMediaToMastodon(*domain, *token, requestBody.File)
 	if err != nil {

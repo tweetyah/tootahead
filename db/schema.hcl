@@ -130,6 +130,10 @@ table "posts" {
     null = false
     type = int
   }
+  column "linked_media" {
+    null = true
+    type = json
+  }
   primary_key {
     columns = [column.id]
   }
@@ -193,6 +197,10 @@ table "user_tokens" {
     columns = [column.id]
   }
   key {
+    columns = [column.user_id]
+  }
+  index {
+    unique = true
     columns = [column.user_id]
   }
 }

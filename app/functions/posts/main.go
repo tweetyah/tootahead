@@ -30,7 +30,7 @@ func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB
 	filter := request.QueryStringParameters["filter"]
 
 	if filter == "scheduled" {
-		query := "select id, text, send_at, status from posts where id_user = ? and status = ?"
+		query := "select id, text, send_at, status, linked_media from posts where id_user = ? and status = ?"
 		res, err := db.Query(query, claims["user_id"], constants.PostStatus_Scheduled)
 		if err != nil {
 			return utils.ErrorResponse(err, "query db")
@@ -38,9 +38,16 @@ func Get(request events.APIGatewayProxyRequest, claims jwt.MapClaims, db *sql.DB
 
 		for res.Next() {
 			var p lib.Post
-			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status)
+			var mediaString string
+			err = res.Scan(&p.Id, &p.Text, &p.SendAt, &p.Status, &mediaString)
 			if err != nil {
 				return utils.ErrorResponse(err, "scan")
+			}
+			if mediaString != "" {
+				err := json.Unmarshal([]byte(mediaString), &p.Media)
+				if err != nil {
+					return utils.ErrorResponse(err, "unmarshal media")
+				}
 			}
 			posts = append(posts, p)
 		}

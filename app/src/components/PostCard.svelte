@@ -27,6 +27,17 @@
     <div class="mb-2">
       { @html post.html() }
     </div>
+
+    {#if post.media}
+      <div class="flex gap-2 mb-2">
+        {#each post.media as image}
+          <div class="bg-gray-50/80 h-[100px] w-[100px] rounded hover:cursor-pointer flex items-center justify-center p-1">      
+            <img src={image.preview_url} alt={image.id} class="" />
+          </div>
+        {/each}
+      </div>
+    {/if}
+
     <div class="flex">
       <div class="flex-1 flex">
         <div class="bg-gray-200 flex content-center items-center px-2 rounded text-sm">
