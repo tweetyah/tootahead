@@ -20,7 +20,7 @@ func GetMastodonTokens(instanceDomain, code, clientId, clientSecret string) (*Ma
 		"client_id":     {clientId},
 		"client_secret": {clientSecret},
 		"redirect_uri":  {os.Getenv("VITE_REDIRECT_URI")},
-		"scope":         {"read:accounts write:statuses"},
+		"scope":         {"read:accounts write:statuses write:media"},
 	}
 
 	mastodonUrl := fmt.Sprintf("https://%v/oauth/token", instanceDomain)
@@ -224,7 +224,7 @@ func RegisterMastodonApp(domain string) (*MastodonAppRegistration, error) {
 	formData := url.Values{
 		"client_name":   {"TootAhead"},
 		"redirect_uris": {os.Getenv("VITE_REDIRECT_URI")},
-		"scopes":        {"read:accounts write:statuses"},
+		"scopes":        {"read:accounts write:statuses write:media"},
 		"website":       {"https://tootahead.com"},
 	}
 	url := fmt.Sprintf("https://%v/api/v1/apps", domain)
@@ -254,4 +254,56 @@ type MastodonAppRegistration struct {
 	ClientID     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	VapidKey     string `json:"vapid_key"`
+}
+
+func UploadMediaToMastodon(instanceDomain string, accessToken string, encodedData string) (*UploadMediaToMastodonResponse, error) {
+	data := url.Values{
+		"file": {encodedData},
+	}
+	mastodonUrl := fmt.Sprintf("https://%v/api/v2/media", instanceDomain)
+	opts := FetchOptions{
+		Method:   "POST",
+		FormData: &data,
+		Headers: map[string]string{
+			"Authorization": fmt.Sprintf("Bearer %v", accessToken),
+		},
+	}
+	res, err := Fetch(mastodonUrl, &opts)
+	if err != nil {
+		return nil, errors.Wrap(err, "(UploadMediaToMastodon) fetch")
+	}
+
+	var response UploadMediaToMastodonResponse
+	err = res.MarshalJson(&response)
+	if err != nil {
+		return nil, errors.Wrap(err, "(UploadMediaToMastodon) marshal")
+	}
+
+	return &response, nil
+}
+
+type UploadMediaToMastodonResponse struct {
+	ID               string      `json:"id"`
+	Type             string      `json:"type"`
+	URL              string      `json:"url"`
+	PreviewURL       string      `json:"preview_url"`
+	RemoteURL        interface{} `json:"remote_url"`
+	PreviewRemoteURL interface{} `json:"preview_remote_url"`
+	TextURL          interface{} `json:"text_url"`
+	Meta             struct {
+		Original struct {
+			Width  int     `json:"width"`
+			Height int     `json:"height"`
+			Size   string  `json:"size"`
+			Aspect float64 `json:"aspect"`
+		} `json:"original"`
+		Small struct {
+			Width  int     `json:"width"`
+			Height int     `json:"height"`
+			Size   string  `json:"size"`
+			Aspect float64 `json:"aspect"`
+		} `json:"small"`
+	} `json:"meta"`
+	Description interface{} `json:"description"`
+	Blurhash    string      `json:"blurhash"`
 }

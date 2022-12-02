@@ -4,3 +4,4 @@
 .netlify
 
 scheduler/dist
+.env

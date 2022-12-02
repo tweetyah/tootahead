@@ -253,3 +253,25 @@ func CreateUserFromSocialLogin(providerType int, providerId string) (*User, erro
 
 	return &user, nil
 }
+
+// Fetches the users instance domain and token from the database
+func GetMastodonInstanceAndTokenByUser(userId int) (*string, *string, error) {
+	db, err := GetDatabase()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "(GetMastodonInstanceAndTokenByUser) get db")
+	}
+
+	query := "select access_token, mastodon_domain from user_tokens where user_id = ? limit 1"
+	res := db.QueryRow(query, userId)
+
+	var token, domain string
+	err = res.Scan(&token, &domain)
+	if err != nil && err == sql.ErrNoRows {
+		return nil, nil, nil
+	}
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "(GetMastodonInstanceAndTokenByUser) scan")
+	}
+
+	return &domain, &token, nil
+}

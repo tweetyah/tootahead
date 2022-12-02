@@ -56,7 +56,7 @@
     let url = `https://${validatedUrl}/oauth/authorize?`
     url += `&client_id=${json.clientId}`
     url += `&redirect_uri=${import.meta.env.VITE_REDIRECT_URI}`
-    url += `&scope=read:accounts write:statuses`
+    url += `&scope=read:accounts write:statuses write:media`
     url += '&grant_type=authorization_code'
     url += '&response_type=code'
     url += '&state=' + validatedUrl

@@ -48,6 +48,12 @@ export class ApiService {
     return await this.execute("delete", `/posts`, JSON.stringify(posts), true)
   }
 
+  async uploadMedia(file: any) {
+    return await this.execute("post", "/media", JSON.stringify({
+      file
+    }))
+  }
+
   async fetchCategories(): Promise<Category[]> {
     return await this.execute("get", "/categories")
   }

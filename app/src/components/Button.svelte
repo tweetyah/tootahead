@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let title: string
+  export let title: string = ""
   export let onClick:Function
   export let icon: string = ""
   export let variant: string = ""
@@ -11,9 +11,12 @@
 </script>
 
 
-<button class="{classes} shadow-sm rounded p-1 text-sm" on:click={() => onClick()} disabled={disabled}>
+<button class="{$$props.class} {classes} shadow-sm rounded p-1 text-sm" on:click={() => onClick()} disabled={disabled}>
   {#if icon !== ""}
     <i class="bx {icon}"></i>
   {/if}
-  { title }
+  {#if title}
+    { title }
+  {/if}
+  <slot />
 </button>
